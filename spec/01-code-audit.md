@@ -8,7 +8,7 @@ Source: `/root/Gully_Detection` (HEAD `511740b`). Audited 2026-10-22, without ac
 |---|---|---|
 | Tiles | `Data_Downloading/`, `Data_Preparation/` | Per location: `rgb_{0..6}_tile_{id}.tif` (NAIP, 2-year bins 2010–2024, 1 m, 128×128 px) + `rgb_highres_tile_{id}.tif` (MSDIS 2023, ~15 cm, ~853 px). |
 | VLM labeling | `weak-supervision/large_dataset/{ollama,pytorch}_query*.py` | Ollama, one request at a time. **The 8 images are pasted into a 4×2 collage at 300×300 px each** (`collage_images`), so the 15 cm image is downsampled to ~43 cm/px and the 1 m images are upsampled. Free-text answer, mapped to a label via string/CLIP-embedding matching. |
-| Multi-question | `pytorch_query_multi_question.py` | 15 yes/no questions to Llama-3.2-Vision-90B; an LLM (Llama 3.2 or Llama 4 Scout) aggregates them into a label. |
+| Multi-question | `pytorch_query_multi_question.py` | 17 yes/no questions to Llama-3.2-Vision-90B; an LLM (Llama 3.2 or Llama 4 Scout) aggregates them into a label. |
 | Label matrix | `large_dataset/results/WS_on_Gully.ipynb` | 3 LFs: Llama3.2-90B multi-question, Llama3.2-90B single, Qwen2.5-VL-72B single. Qwen2.5-VL-7B and Llama 4 Scout were tried and dropped. |
 | Label model | same notebook | `snorkel.LabelModel.fit(L_train, Y_dev, n_epochs=100, seed=12)`, where `Y_dev` = **test-set GT**. |
 | Pseudo-labels | `train_lable_model_results.json` | 18,179 locations, `proba` + `label`. |
@@ -53,7 +53,7 @@ Severity: **S1** = may change headline results, **S2** = affects validity or rev
 - `dem2so/`, `Data_Preparation/rgb_dem_*`: **a DEM tiling pipeline already exists** (DEM and stream-order tiles per HUC). This makes the terrain labeler (E5) much cheaper than assumed. **VERIFY** whether the DEM covers the 3 unlabeled HUC12s.
 - `labeling_tool/`: annotation GUI and aggregation. Reuse it for any extra annotation (decision D-4).
 - `weak-supervision/large_dataset/results/*.json`: existing LF outputs for 18,179 + 548 locations. Ingest them as-is, so the old Table 2 can be reproduced (E0).
-- The 15 multi-question prompts (inside the multi-question JSON keys) and the single-question prompt (`ollama_query.py --prompt`): copy them verbatim into `configs/prompts/`.
+- The 17 multi-question prompts are copied verbatim into `configs/prompts/multi_question.yaml` (the aggregator prompt too; the old notes said 15, the code has 17). The single-question prompt behind the legacy `*_sq` outputs was passed as `ollama_query.py --prompt` and is **not in the repo**: ask the user. `configs/prompts/single_question.yaml` holds a new `sq_v1` instead.
 
 ## 5. Ground-truth schemes (recovered 2026-10-22; implemented in `src/gully/data/gt.py`)
 

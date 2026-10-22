@@ -1,0 +1,47 @@
+# GPU job: frozen FlexiViT-S features for all 18,727 locations -> /pvc/ali-vol-500g/gully/features/<tag>.
+# Smoke test: add "--limit", "64" and change --tag. Needs code staged by cluster/gully_work_pod.yaml.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: gully-extract-features-b
+spec:
+  backoffLimit: 1
+  template:
+    spec:
+      restartPolicy: Never
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: nvidia.com/gpu.product
+                    operator: In
+                    values: [NVIDIA-A100-SXM4-80GB, NVIDIA-A100-80GB-PCIe, NVIDIA-A100-PCIE-40GB]  # ViT-S needs little memory
+      containers:
+        - name: extract
+          image: pytorch/pytorch:2.5.1-cuda12.4-cudnn9-runtime
+          workingDir: /pvc/ali-vol-500g/gully/code
+          command: ["bash", "-c"]
+          args:
+            - |
+              set -e
+              (apt-get update -qq && apt-get install -y -qq libexpat1) >/dev/null 2>&1 || true
+              pip install -q timm rasterio pandas pyarrow scipy scikit-learn pyyaml
+              pip install -q -e . --no-deps
+              python scripts/extract_features.py --index artifacts/index/locations.parquet \
+                --pvc-root ali-vol-500g=/pvc/ali-vol-500g --pvc-root ali-vol-1tera=/pvc/ali-vol-1tera \
+                --out /pvc/ali-vol-500g/gully/features --tag flexivit_s_smoke_b --limit 64 --workers 5
+          resources:
+            limits: {nvidia.com/gpu: 1, cpu: "6", memory: 7Gi}
+            requests: {cpu: "5", memory: 6Gi}
+          volumeMounts:
+            - {name: v500, mountPath: /pvc/ali-vol-500g}
+            - {name: v1t, mountPath: /pvc/ali-vol-1tera, readOnly: true}
+            - {name: shm, mountPath: /dev/shm}
+      volumes:
+        - name: v500
+          persistentVolumeClaim: {claimName: ali-vol-500g}
+        - name: v1t
+          persistentVolumeClaim: {claimName: ali-vol-1tera, readOnly: true}
+        - name: shm
+          emptyDir: {medium: Memory, sizeLimit: 8Gi}

@@ -21,6 +21,8 @@ split:
   block_size_m: 1000          # spatial blocks assigned whole to one split
   exclusion_buffer_m: 256     # 2 tile widths (128 px at 1 m); pool locations this close to dev/test are excluded
 image_roles:
-  naip: [0, 1, 2, 3, 4, 5, 6]   # year bins: fill from the tile metadata (open item)
+  naip: [0, 1, 2, 3, 4, 5, 6]   # rgb_i = NAIP bin starting 2010+2i (Earth Engine filter [2010+2i, 2012+2i)); the old collage labels them 2010..2022
+  naip_years: [2010, 2012, 2014, 2016, 2018, 2020, 2022]
+  highres_year: 2023
   pool_highres: rgb_highres
   test_highres: rgb_11

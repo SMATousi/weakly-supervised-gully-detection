@@ -8,7 +8,7 @@ weakly-supervised-gully-detection/
 ├── configs/
 │   ├── data.yaml              # data roots, HUC list, split seed, buffer distance
 │   ├── labelers/*.yaml        # one file per labeler (model id + revision, prompt, image mode, sampling)
-│   ├── prompts/               # single_question.txt, multi_question.yaml (15 Qs), aggregator.txt
+│   ├── prompts/               # single_question.yaml, multi_question.yaml (17 Qs + aggregator)
 │   ├── label_models.yaml
 │   └── student/*.yaml         # backbone, head, loss, optimizer, seeds
 ├── src/gully/
