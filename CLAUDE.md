@@ -21,10 +21,11 @@ Pipeline: open-weight VLMs label ~18k unlabeled locations (8 images each: 7 NAIP
 
 ## Status as of 2026-10-22
 - Done: paper review, cost/feasibility discussion, `spec/` written. **No code yet.**
-- Decisions made (see `Decision:` in `spec/00-roadmap.md`): D-1 fixed dev/test; D-2 buffer = 2 tile widths (128 px at 1 m, so 256 m); D-3 labeler list to be set by Claude after checking cluster GPU memory; D-4 ~100-location random-pool annotation approved (must start by D5; prepare the annotation set early); D-5 decide later. Official CVPR 2027 dates still pending.
+- Decisions made (see `Decision:` in `spec/00-roadmap.md`): D-1 fixed dev/test; D-2 buffer = 2 tile widths (128 px at 1 m, so 256 m); D-3 resolved: 80 GB A100s, original E3 list stands; D-4 ~100-location random-pool annotation approved (must start by D5; prepare the annotation set early); D-5 decide later. Official CVPR 2027 dates still pending.
 - Data located and recorded in `configs/data.yaml`; B1 confirmed from filenames. Cluster access works (`export PATH="$HOME/.krew/bin:$PATH"`; manifests in `cluster/`).
 - Standing instruction: after each step, update the specs, then commit and push (user-approved).
-- Next: check GPU types on Nautilus (D-3), then D1 (repo skeleton).
+- GPUs: A100 80 GB on Nautilus (D-3 resolved; see `spec/00-roadmap.md` Compute plan).
+- Next: D1 (repo skeleton, env, configs).
 
 ## First things to do on the data machine
 1. Locate the data (pool tiles, test tiles, DEM tiles from `dem2so`) and the old repo; check GPU types/memory (`nvidia-smi`). Record them in `configs/data.yaml` and in this file.

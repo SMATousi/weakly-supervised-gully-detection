@@ -5,8 +5,10 @@
 Owner key: **C** = Claude (code, analysis, drafting), **H** = human only (data host, GPUs, annotators, author decisions), **GPU** = long unattended job.
 
 ## Compute plan
-- 4×A100: VLM labeling (vLLM) on D3–D9; free afterwards for feature extraction and E14.
-- 8×A10: feature extraction (D4–D5), then every student run.
+- **Nautilus, A100 only** (decision; checked 2026-10-22). Select with `nodeAffinity` on `nvidia.com/gpu.product`: `NVIDIA-A100-SXM4-80GB` (nodes with 4-8 GPUs: SDSC, Mizzou fiona, OSU, KSU, USD, UNL, ...) or `NVIDIA-A100-80GB-PCIe` (SDSU, Fullerton). About 140 full 80 GB A100s exist cluster-wide. Avoid `A100-PCIE-40GB` (mostly 1 GPU per node, so no tensor parallel) and the `MIG-1g.10gb` slices (SDSU).
+- Namespace `gpn-mizzou-vigir` cannot use H100/H200/GH200 (quota 0); max 200 pods.
+- VLM labeling (vLLM): one pod per model with TP=2 or 4 on one 80 GB node, or several 1-GPU pods for models <=30B; shard the pool by index as an Indexed Job. Student runs on cached features fit one A100 (or any smaller GPU).
+- Free-GPU counts are not visible to us; expect queueing. Submit the long VLM jobs early and make them resumable.
 - **Critical path: the full-pool VLM runs.** Everything else is minutes-scale once features are cached.
 
 ## Week 1: foundation and long jobs (D1–D7)
@@ -76,6 +78,6 @@ Owner key: **C** = Claude (code, analysis, drafting), **H** = human only (data h
 ## Open decisions (need an answer from H)
 - **D-1** Split: fixed dev/test (recommended, simpler) vs nested CV over the 484 labeled locations (more stable, ~2× compute and complexity) (Decision: fixed dev/test).
 - **D-2** Exclusion buffer distance (256 m proposed ≈ 2 tile widths)(Decision: 2 tile widths).
-- **D-3** Exact candidate list for E3, given the actual GPU memory(Decision: I'll give you access to the cluster and you will find out).
+- **D-3** Exact candidate list for E3, given the actual GPU memory(Decision: use the cluster; resolved 2026-10-22: 80 GB A100s, see Compute plan and `03-experiments.md`).
 - **D-4** Optional: the annotators label ~100 *random* pool locations (≈2–3 h each with the existing tool) to estimate real prevalence and realistic precision. High value for reviewers, costs annotator time. Must start by D5 to be usable (Decision: approved).
 - **D-5** Venue fallback if G2 fails (e.g., CVPR EarthVision workshop) (Decision: We'll decide if we get there).

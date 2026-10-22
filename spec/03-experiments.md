@@ -48,7 +48,7 @@ Pin exact HF revisions in `configs/labelers/`. Substitute a newer open release o
 | Llama-3.2-90B multi-question (legacy outputs reused) | — | 0 |
 | Qwen3-VL-235B-A22B (AWQ) | tight | 8–15 h, P2 |
 
-\*18.2k locations, single question, multi-image, vLLM batching; measure on dev first and update this table. **If the A100s are 40 GB:** drop to the ≤38B models plus AWQ 70B-class.
+\*18.2k locations, single question, multi-image, vLLM batching; measure on dev first and update this table. **GPU basis (D-3, resolved):** 80 GB A100s (SXM4 nodes with 4-8 GPUs, PCIe nodes with 4), so the 72-78B models run bf16 at TP=4 and the table above stands. Do not schedule on the 40 GB PCIe A100s. Qwen3-VL-235B stays P2 (needs 8 GPUs on one SXM node or AWQ at TP=4).
 
 Labeler output must be JSON (`{"answer": "yes|no|unsure", "confidence": 0-1}`), via guided decoding; also record logprob P(yes) of the first answer token.
 
