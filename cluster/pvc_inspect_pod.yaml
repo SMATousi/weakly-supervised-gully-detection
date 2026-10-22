@@ -1,0 +1,22 @@
+# Short-lived CPU pod to find the data on the user's PVCs (read-only). Delete when done.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: gully-pvc-inspect
+spec:
+  restartPolicy: Never
+  containers:
+    - name: shell
+      image: ubuntu:24.04
+      command: ["bash", "-c", "sleep 3600"]
+      resources:
+        limits: {cpu: "1", memory: 2Gi}
+        requests: {cpu: "1", memory: 2Gi}
+      volumeMounts:
+        - {name: v1t, mountPath: /pvc/ali-vol-1tera, readOnly: true}
+        - {name: v500, mountPath: /pvc/ali-vol-500g, readOnly: true}
+  volumes:
+    - name: v1t
+      persistentVolumeClaim: {claimName: ali-vol-1tera, readOnly: true}
+    - name: v500
+      persistentVolumeClaim: {claimName: ali-vol-500g, readOnly: true}

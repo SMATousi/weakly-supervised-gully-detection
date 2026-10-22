@@ -1,0 +1,14 @@
+# Data locations on Nautilus (namespace gpn-mizzou-vigir). Verified 2026-10-22 with cluster/pvc_inspect_pod.yaml.
+# kubectl needs the krew plugin on PATH: export PATH="$HOME/.krew/bin:$PATH"
+pvc_pool: ali-vol-500g
+pool_root: large_unlabeled_dataset          # on ali-vol-500g
+pool:
+  rgb_images: large_unlabeled_dataset/rgb_images    # 145,432 files = 18,179 locations x 8 (rgb_0..6, rgb_highres)
+  dem: large_unlabeled_dataset/dem                  # dem_tile_{id}.tif, all 18,179 pool locations
+  ground_truth: large_unlabeled_dataset/ground_truth  # negative_ground_truth_tile_{id}.tif (18,179)
+pvc_test: ali-vol-1tera
+test:
+  root: other-pvcs/final_pos_neg_test_data_merging_25_2   # all_tiles/, pos/, neg/
+  rgb_images: other-pvcs/final_pos_neg_test_data_merging_25_2/all_tiles  # 548 locations x 8 (rgb_0..6, rgb_11 = high-res)
+# Other copies (do not use): ali-vol-1tera/other-pvcs/large_unlabeled_dataset (root-only perms),
+# large_data.tar.gz, A2*, ali-vol-500g/test_data_8_images.tar.gz (not gzip; unreadable as .tar.gz).

@@ -1,6 +1,6 @@
 # 04 — Paper revisions
 
-Paper source: `/root/papers/WS+Gully/68654fca3ff58f80fea5c916` (Overleaf-synced; currently the WACV 2026 kit, Paper ID 2172).
+Paper source: `/root/papers/weak-supervision-gully/68654fca3ff58f80fea5c916` (Overleaf-synced; currently the WACV 2026 kit, Paper ID 2172).
 
 **Framing:** a dataset + benchmark + weak-supervision study for multi-temporal, multi-resolution remote sensing, with a small method contribution (temporal-attention student + confidence-valued VLM labelers). All models are open-weight and reproducible.
 

@@ -17,12 +17,14 @@ Pipeline: open-weight VLMs label ~18k unlabeled locations (8 images each: 7 NAIP
 - Old data paths hard-coded in the old code: pool images `/root/home/pvc/large_unlabeled_dataset/rgb_images/`, test images `/root/home/pvc/final_pos_neg_test_data_merging_25_2/all_tiles/`. File naming: `rgb_{0..6}_tile_{id}.tif`, `rgb_highres_tile_{id}.tif`.
 - Ground truth: `Gully_Detection/labeling_tool/v2_results/final/agg/neg_strict_labels_majority.json` (main GT; 484 non-null: 257 pos / 227 neg). Per-annotator raw scores are in the same folder (3 annotators; refer to them by role, not name, in paper/spec).
 - Legacy labeler outputs: `Gully_Detection/weak-supervision/large_dataset/results/` (pool) and `.../results/test_data/` (test).
-- Paper (Overleaf-synced git repo, WACV 2026 kit): `/root/papers/WS+Gully/68654fca3ff58f80fea5c916/wacv-2026-author-kit-template/`. It may not exist on this machine; ask the user if it's needed.
+- Paper (Overleaf-synced git repo, WACV 2026 kit): `/root/papers/weak-supervision-gully/68654fca3ff58f80fea5c916/wacv-2026-author-kit-template/`. Present on this machine; push access is configured via the remote URL (token stored in that repo's `.git/config`, never copy it elsewhere).
 
 ## Status as of 2026-10-22
 - Done: paper review, cost/feasibility discussion, `spec/` written. **No code yet.**
-- Not started: roadmap D1. The user will say when to start.
-- Waiting on the user: the open decisions D-1 to D-5 in `spec/00-roadmap.md` (split design, buffer distance, labeler list given GPU memory, the optional 100-location prevalence annotation, fallback venue) and the official CVPR 2027 dates.
+- Decisions made (see `Decision:` in `spec/00-roadmap.md`): D-1 fixed dev/test; D-2 buffer = 2 tile widths (128 px at 1 m, so 256 m); D-3 labeler list to be set by Claude after checking cluster GPU memory; D-4 ~100-location random-pool annotation approved (must start by D5; prepare the annotation set early); D-5 decide later. Official CVPR 2027 dates still pending.
+- Data located and recorded in `configs/data.yaml`; B1 confirmed from filenames. Cluster access works (`export PATH="$HOME/.krew/bin:$PATH"`; manifests in `cluster/`).
+- Standing instruction: after each step, update the specs, then commit and push (user-approved).
+- Next: check GPU types on Nautilus (D-3), then D1 (repo skeleton).
 
 ## First things to do on the data machine
 1. Locate the data (pool tiles, test tiles, DEM tiles from `dem2so`) and the old repo; check GPU types/memory (`nvidia-smi`). Record them in `configs/data.yaml` and in this file.
