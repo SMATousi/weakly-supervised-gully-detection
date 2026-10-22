@@ -30,8 +30,9 @@ Pipeline: open-weight VLMs label ~18k unlabeled locations (8 images each: 7 NAIP
 - `scripts/build_index.py` done (run in a cluster pod; slow on CephFS, needs a process pool). `artifacts/index/locations.parquet` (18,727 rows) is local only (git-ignored); data facts in `spec/01-code-audit.md` §6 (alpha band, 59 truncated high-res tiles, variable high-res sizes).
 - `legacy.py` + `scripts/ingest_legacy.py` done: 6 legacy labelers as JSONL in `artifacts/labels/`; audit accuracies (0.653 / 0.607 / 0.568 at cov 0.876) reproduce exactly (`tests/test_legacy.py`).
 - `scripts/make_splits.py` done: dev 150 / test 334 / labeled_null 64; **E1: pool is >=1.8 km from every labeled location, so 0 pool locations excluded** (`results/E1/`). Closest dev-test pair 27 m (see `spec/03-experiments.md` results log).
+- `ws/label_matrix.py`, `ws/label_models.py` (MV, Snorkel), `eval/metrics.py`, `scripts/run_e0.py` done. E0 label step: old pseudo-labels reproduced 100%; the B4 leak barely changes anything (class balance 0.47 vs dev 0.47); Snorkel dev acc 0.673 = best single LF (see `spec/03-experiments.md` results log).
 - B3 NOT verifiable locally (only a 2024-07 wandb run exists); needs the user's wandb project.
-- Next: E0 (legacy LFs -> Snorkel with Y_dev=test vs dev prior -> fixed), `ws/label_matrix.py`, `ws/label_models.py`; copy the index to a writable PVC dir for cluster jobs; D-4 annotation sample list.
+- Next: `student/` (features, heads, train) for the E0 student comparison and E7/E11; copy the index to a writable PVC dir for cluster jobs; D-4 annotation sample list.
 
 ## First things to do on the data machine
 1. Locate the data (pool tiles, test tiles, DEM tiles from `dem2so`) and the old repo; check GPU types/memory (`nvidia-smi`). Record them in `configs/data.yaml` and in this file.
