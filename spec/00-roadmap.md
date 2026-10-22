@@ -52,7 +52,7 @@ Owner: **C** Claude, **H** human, **GPU** unattended job.
 
 **D4-D5: features**
 - [x] C: `student/features.py` + `scripts/extract_features.py` (tested; reads 8 files concurrently)
-- [ ] GPU: FlexiViT-S features for pool + labeled (running, 18,727 locations; smoke test passed)
+- [x] GPU: FlexiViT-S features for pool + labeled (18,727 locations, 7.5 GB, `ali-vol-500g:gully/features/flexivit_s`)
 - [ ] GPU: ViT-S features (E10)
 - [ ] GPU: one RS foundation-model backbone (E10; cut-list item 4)
 
@@ -63,8 +63,9 @@ Owner: **C** Claude, **H** human, **GPU** unattended job.
 **D5-D7: student**
 - [x] C: `student/heads.py` (linear, mean-pool MLP, temporal attention) and `train.py` (dev-based selection), toy-tested
 - [x] C: `evaluate.py` (only reader of test labels; bootstrap CIs, McNemar), toy-tested
+- [x] C: `fit_label_model.py` (pseudo-labels with a dev-only class prior) and `run_grid.py` (many students from one GPU-resident copy of the features)
 - [ ] C: `predict_student.py` (scores for dev / test locations from a saved model)
-- [ ] C: **E7** and **E11** on legacy labels for early signal (seeds x heads)
+- [ ] C: **E7** and **E11** on legacy labels for early signal (seeds x heads): first grid (4 pseudo-label sets x 3 heads x 1 seed) running as `gully-train-grid`
 - [ ] H+C: **Gate G2**: new labelers beat or diversify the old set on dev? temporal head >= linear head on dev?
 
 **D-4 prevalence annotation**

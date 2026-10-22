@@ -21,6 +21,16 @@ def load_features(feat_dir: str, device: str):
     return tok, np.load(f"{feat_dir}/valid.npy"), np.load(f"{feat_dir}/ids.npy")
 
 
+def to_device(X, rows, device: str, chunk: int = 512) -> torch.Tensor:
+    """Gather `rows` of a (memmapped) feature array onto the device in chunks, without a host copy."""
+    rows = np.asarray(rows)
+    out = torch.empty((len(rows), *X.shape[1:]), dtype=torch.float16, device=device)
+    for i in range(0, len(rows), chunk):
+        r = rows[i:i + chunk]
+        out[i:i + len(r)] = torch.as_tensor(np.stack([X[j] for j in r])).to(device)
+    return out
+
+
 def _batches(n: int, bs: int, rng: np.random.Generator | None):
     order = rng.permutation(n) if rng is not None else np.arange(n)
     for i in range(0, n, bs):
@@ -32,7 +42,7 @@ def predict(model, X, V, device: str, bs: int = 256) -> np.ndarray:
     model.eval()
     out = []
     for i in range(0, len(X), bs):
-        x = torch.as_tensor(np.asarray(X[i:i + bs])).to(device)
+        x = torch.as_tensor(X[i:i + bs]).to(device)
         v = torch.as_tensor(V[i:i + bs]).to(device)
         out.append(F.softmax(model(x, v), -1)[:, 1].cpu())
     return torch.cat(out).numpy()
@@ -50,7 +60,7 @@ def train_student(X_tr, V_tr, p1_tr, X_dev, V_dev, y_dev, head: str = "temporal"
     target = torch.as_tensor(p1_tr, dtype=torch.float32)
     if hard:
         target = (target >= 0.5).float()
-    Xg = torch.as_tensor(np.asarray(X_tr)).to(device)
+    Xg = X_tr if torch.is_tensor(X_tr) else torch.as_tensor(np.asarray(X_tr)).to(device)
     Vg, Tg = torch.as_tensor(V_tr).to(device), target.to(device)
     rng = np.random.default_rng(seed)
     best, best_score, hist = None, -np.inf, []

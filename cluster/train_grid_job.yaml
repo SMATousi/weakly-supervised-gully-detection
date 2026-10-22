@@ -1,0 +1,44 @@
+# GPU job: train a grid of students from cached features (run_grid.py). Edit the --pseudo/--heads/--seeds/--exp line.
+# Stage code first: tar src scripts configs pyproject.toml artifacts/{index,gt,ws} | kubectl exec -i gully-work -- tar xf - -C /pvc/ali-vol-500g/gully/code
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: gully-train-grid
+spec:
+  backoffLimit: 6
+  template:
+    spec:
+      restartPolicy: Never
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: NotIn
+                    values: [k8s-haosu-12.sdsc.optiputer.net]   # GPU lost, rejects pods
+                  - key: nvidia.com/gpu.memory
+                    operator: Gt
+                    values: ["20000"]                           # features (7.3 GB) + activations must fit
+      containers:
+        - name: train
+          image: pytorch/pytorch:2.5.1-cuda12.4-cudnn9-runtime
+          workingDir: /pvc/ali-vol-500g/gully/code
+          command: ["bash", "-c"]
+          args:
+            - |
+              set -e
+              pip install -q pandas pyarrow scipy scikit-learn pyyaml
+              pip install -q -e . --no-deps
+              python scripts/run_grid.py --features /pvc/ali-vol-500g/gully/features/flexivit_s \
+                --pseudo snorkel_legacy3 snorkel_legacy3:hard mv_legacy3:hard mv_qwen72 \
+                --heads linear mlp temporal --seeds 0 --exp E_early_legacy \
+                --out /pvc/ali-vol-500g/gully/results --ckpt-dir /pvc/ali-vol-500g/gully/students
+          resources:
+            limits: {nvidia.com/gpu: 1, cpu: "8", memory: 9Gi}
+            requests: {cpu: "6", memory: 7Gi}
+          volumeMounts:
+            - {name: v500, mountPath: /pvc/ali-vol-500g}
+      volumes:
+        - name: v500
+          persistentVolumeClaim: {claimName: ali-vol-500g}
