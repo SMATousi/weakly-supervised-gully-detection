@@ -74,8 +74,8 @@ Owner key: **C** = Claude (code, analysis, drafting), **H** = human only (data h
 | Temporal head doesn't beat the simpler heads | Report it; fall back to the "dataset + benchmark + WS study" framing; the method claim shrinks to confidence-valued LFs. |
 
 ## Open decisions (need an answer from H)
-- **D-1** Split: fixed dev/test (recommended, simpler) vs nested CV over the 484 labeled locations (more stable, ~2× compute and complexity).
-- **D-2** Exclusion buffer distance (256 m proposed ≈ 2 tile widths).
-- **D-3** Exact candidate list for E3, given the actual GPU memory.
-- **D-4** Optional: the annotators label ~100 *random* pool locations (≈2–3 h each with the existing tool) to estimate real prevalence and realistic precision. High value for reviewers, costs annotator time. Must start by D5 to be usable.
-- **D-5** Venue fallback if G2 fails (e.g., CVPR EarthVision workshop).
+- **D-1** Split: fixed dev/test (recommended, simpler) vs nested CV over the 484 labeled locations (more stable, ~2× compute and complexity) (Decision: fixed dev/test).
+- **D-2** Exclusion buffer distance (256 m proposed ≈ 2 tile widths)(Decision: 2 tile widths).
+- **D-3** Exact candidate list for E3, given the actual GPU memory(Decision: I'll give you access to the cluster and you will find out).
+- **D-4** Optional: the annotators label ~100 *random* pool locations (≈2–3 h each with the existing tool) to estimate real prevalence and realistic precision. High value for reviewers, costs annotator time. Must start by D5 to be usable (Decision: approved).
+- **D-5** Venue fallback if G2 fails (e.g., CVPR EarthVision workshop) (Decision: We'll decide if we get there).
