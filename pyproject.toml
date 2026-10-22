@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gully"
+version = "0.1.0"
+description = "Weakly supervised ephemeral-gully detection (VLM labelers -> label model -> student)"
+requires-python = ">=3.10"
+dependencies = [
+  "numpy",
+  "pandas",
+  "pyarrow",
+  "pyyaml",
+  "scikit-learn",
+  "scipy",
+  "rasterio",
+  "pillow",
+]
+
+[project.optional-dependencies]
+# Heavy / GPU dependencies are extras so the base install (index, GT, metrics, tests) stays light.
+vlm = ["vllm", "transformers"]
+student = ["torch", "timm"]
+ws = ["snorkel", "flyingsquid"]
+wandb = ["wandb"]
+dev = ["pytest", "ruff"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

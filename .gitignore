@@ -1,0 +1,10 @@
+__pycache__/
+*.egg-info/
+.venv/
+.pytest_cache/
+.ruff_cache/
+# large outputs: features, checkpoints, raw labeler outputs, index (see spec/02-architecture.md)
+artifacts/*
+!artifacts/.gitkeep
+wandb/
+*.ipynb_checkpoints

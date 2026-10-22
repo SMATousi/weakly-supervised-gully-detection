@@ -25,7 +25,8 @@ Pipeline: open-weight VLMs label ~18k unlabeled locations (8 images each: 7 NAIP
 - Data located and recorded in `configs/data.yaml`; B1 confirmed from filenames. Cluster access works (`export PATH="$HOME/.krew/bin:$PATH"`; manifests in `cluster/`).
 - Standing instruction: after each step, update the specs, then commit and push (user-approved).
 - GPUs: A100 80 GB on Nautilus (D-3 resolved; see `spec/00-roadmap.md` Compute plan).
-- Next: D1 (repo skeleton, env, configs).
+- D1 skeleton done: `pyproject.toml` (extras: vlm, student, ws, wandb, dev), `src/gully/` packages, `configs/` dirs, ruff+pytest CI, `uv venv .venv`. Heavy deps are extras, not installed yet.
+- Next: D1-D2 `scripts/build_index.py`, `build_gt.py`, `legacy.py` (needs data access from a cluster pod), then B3 check and `make_splits.py`.
 
 ## First things to do on the data machine
 1. Locate the data (pool tiles, test tiles, DEM tiles from `dem2so`) and the old repo; check GPU types/memory (`nvidia-smi`). Record them in `configs/data.yaml` and in this file.

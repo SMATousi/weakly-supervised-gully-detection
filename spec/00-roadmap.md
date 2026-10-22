@@ -15,7 +15,7 @@ Owner key: **C** = Claude (code, analysis, drafting), **H** = human only (data h
 
 | Day | Task | Owner | Done when |
 |---|---|---|---|
-| D1 | Repo skeleton, env, configs (02-architecture) | C | `pip install -e .` works; CI lint |
+| D1 | Repo skeleton, env, configs (02-architecture) | C | `pip install -e .` works; CI lint. **Done 2026-10-22** |
 | D1 | Give access to the data host; confirm GPU memory (A100 40 vs 80 GB); confirm DEM coverage of the 3 pool HUC12s | H | Paths in `configs/data.yaml` |
 | D1–D2 | `build_index.py` (roles by filename, prefixed ids), `build_gt.py` (4 schemes, majority, κ), `legacy.py` ingestion | C | Index has 18,179 pool + 484 labeled rows; GT counts match 01-audit §3 |
 | D2 | **Verify B1** (which image is high-res at index 1) and **B3** (how 0.70 was picked) | C+H | Written answer in 01-audit |

@@ -12,3 +12,15 @@ test:
   rgb_images: other-pvcs/final_pos_neg_test_data_merging_25_2/all_tiles  # 548 locations x 8 (rgb_0..6, rgb_11 = high-res)
 # Other copies (do not use): ali-vol-1tera/other-pvcs/large_unlabeled_dataset (root-only perms),
 # large_data.tar.gz, A2*, ali-vol-500g/test_data_8_images.tar.gz (not gzip; unreadable as .tar.gz).
+
+# Split design (decisions D-1, D-2; see spec/03-experiments.md)
+split:
+  seed: 0
+  design: fixed_dev_test
+  dev_fraction: 0.31          # ~150 of 484
+  block_size_m: 1000          # spatial blocks assigned whole to one split
+  exclusion_buffer_m: 256     # 2 tile widths (128 px at 1 m); pool locations this close to dev/test are excluded
+image_roles:
+  naip: [0, 1, 2, 3, 4, 5, 6]   # year bins: fill from the tile metadata (open item)
+  pool_highres: rgb_highres
+  test_highres: rgb_11
