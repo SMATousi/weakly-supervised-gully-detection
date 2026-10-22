@@ -32,7 +32,9 @@ Pipeline: open-weight VLMs label ~18k unlabeled locations (8 images each: 7 NAIP
 - `scripts/make_splits.py` done: dev 150 / test 334 / labeled_null 64; **E1: pool is >=1.8 km from every labeled location, so 0 pool locations excluded** (`results/E1/`). Closest dev-test pair 27 m (see `spec/03-experiments.md` results log).
 - `ws/label_matrix.py`, `ws/label_models.py` (MV, Snorkel), `eval/metrics.py`, `scripts/run_e0.py` done. E0 label step: old pseudo-labels reproduced 100%; the B4 leak barely changes anything (class balance 0.47 vs dev 0.47); Snorkel dev acc 0.673 = best single LF (see `spec/03-experiments.md` results log).
 - B3 NOT verifiable locally (only a 2024-07 wandb run exists); needs the user's wandb project.
-- Next: `student/` (features, heads, train) for the E0 student comparison and E7/E11; copy the index to a writable PVC dir for cluster jobs; D-4 annotation sample list.
+- `student/` written and unit-tested on toy data: `features.py` (8 images by ROLE order, alpha dropped, highres resized to 512 px with patch 64, NAIP 128 px patch 16, mean/std 0.5, truncated highres masked via `valid`), `heads.py` (linear=legacy, mlp, temporal), `train.py` (one step/iter, KL to soft targets, epoch chosen on dev), `scripts/extract_features.py`, `scripts/train_student.py`. NOT yet run on real features.
+- Cluster staging: code + index copied to `ali-vol-500g:gully/code`, features go to `ali-vol-500g:gully/features/<tag>`; manifests `cluster/gully_work_pod.yaml`, `cluster/extract_features_job.yaml` (smoke: 64 locations). Nautilus rule: pod memory limit <= 1.2 x CPU limit. 80 GB A100s were all busy for >30 min, so the job also accepts 40 GB A100s.
+- Next: finish the smoke test, run full extraction, then E0 student comparison, E7, E11; copy the index to a writable PVC dir for cluster jobs; D-4 annotation sample list.
 
 ## First things to do on the data machine
 1. Locate the data (pool tiles, test tiles, DEM tiles from `dem2so`) and the old repo; check GPU types/memory (`nvidia-smi`). Record them in `configs/data.yaml` and in this file.

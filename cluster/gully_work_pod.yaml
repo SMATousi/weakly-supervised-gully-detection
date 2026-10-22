@@ -1,0 +1,19 @@
+# CPU pod with the 500g PVC writable: stage code/index under /pvc/ali-vol-500g/gully/. Delete when done.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: gully-work
+spec:
+  restartPolicy: Never
+  containers:
+    - name: shell
+      image: python:3.11-slim
+      command: ["bash", "-c", "sleep 7200"]
+      resources:
+        limits: {cpu: "2", memory: 4Gi}
+        requests: {cpu: "2", memory: 4Gi}
+      volumeMounts:
+        - {name: v500, mountPath: /pvc/ali-vol-500g}
+  volumes:
+    - name: v500
+      persistentVolumeClaim: {claimName: ali-vol-500g}
