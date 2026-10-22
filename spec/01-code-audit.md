@@ -54,3 +54,16 @@ Severity: **S1** = may change headline results, **S2** = affects validity or rev
 - `labeling_tool/`: annotation GUI and aggregation. Reuse it for any extra annotation (decision D-4).
 - `weak-supervision/large_dataset/results/*.json`: existing LF outputs for 18,179 + 548 locations. Ingest them as-is, so the old Table 2 can be reproduced (E0).
 - The 15 multi-question prompts (inside the multi-question JSON keys) and the single-question prompt (`ollama_query.py --prompt`): copy them verbatim into `configs/prompts/`.
+
+## 5. Ground-truth schemes (recovered 2026-10-22; implemented in `src/gully/data/gt.py`)
+
+The old repo has no script that produces `agg/*_labels*.json`; the per-annotator rules were recovered by matching the saved per-annotator labels (100% agreement, tested in `tests/test_gt.py`). Scores per image are 0-4, where 2 is unsure; a location whose 8 scores are all 2 is null for that annotator. Raw scores are in `data/gt_raw/annotator_{1,2,3}.json` (547 locations), legacy outputs in `data/gt_legacy/`.
+
+| Scheme (new name) | Legacy file | Per-annotator positive iff | Fleiss kappa | Pos / Neg (majority) |
+|---|---|---|---|---|
+| `strict_neg` (**main**) | `neg_strict` | any non-2 score > 0 (negative only if all non-2 scores are 0) | 0.582 | 257 / 227 |
+| `lenient_neg` | `neg_len_1or0` (identical to `pos_len_4or3`) | any score >= 3 | 0.646 | 231 / 256 |
+| `lenient_pos` | `pos_len_4-1` | some score 4 and >= 2 scores >= 1 | 0.552 | 107 / 381 |
+| `strict_pos` | `pos_strict` | some score 4 and >= 2 scores >= 3 | 0.557 | 103 / 385 |
+
+Majority: over annotators with a non-null vote; null if fewer than 2 votes or a tie. Of the 547 scored locations, 484 are non-null under the main scheme. Note `strict_neg` is the most permissive for "positive" and `strict_pos` the most conservative: the scheme names are legacy, so state the rule, not the name, in the paper.

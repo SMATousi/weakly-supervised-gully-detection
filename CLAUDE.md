@@ -26,7 +26,8 @@ Pipeline: open-weight VLMs label ~18k unlabeled locations (8 images each: 7 NAIP
 - Standing instruction: after each step, update the specs, then commit and push (user-approved).
 - GPUs: A100 80 GB on Nautilus (D-3 resolved; see `spec/00-roadmap.md` Compute plan).
 - D1 skeleton done: `pyproject.toml` (extras: vlm, student, ws, wandb, dev), `src/gully/` packages, `configs/` dirs, ruff+pytest CI, `uv venv .venv`. Heavy deps are extras, not installed yet.
-- Next: D1-D2 `scripts/build_index.py`, `build_gt.py`, `legacy.py` (needs data access from a cluster pod), then B3 check and `make_splits.py`.
+- `scripts/build_gt.py` + `gully/data/gt.py` done: all 4 GT schemes reproduce the legacy majority files exactly (257/227 main); rules in `spec/01-code-audit.md` §5. Old repo is at `/root/Gully_Detection` on this machine; raw scores copied to `data/gt_raw/` (annotators by role).
+- Next: `build_index.py` (needs a cluster pod to read tiles), `legacy.py`, B3 check, `make_splits.py`.
 
 ## First things to do on the data machine
 1. Locate the data (pool tiles, test tiles, DEM tiles from `dem2so`) and the old repo; check GPU types/memory (`nvidia-smi`). Record them in `configs/data.yaml` and in this file.
