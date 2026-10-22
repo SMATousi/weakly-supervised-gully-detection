@@ -58,3 +58,11 @@ Labeler output must be JSON (`{"answer": "yes|no|unsure", "confidence": 0-1}`), 
 2. **Confidence-valued LFs.** VLM P(yes) is thresholded on dev into {1, 0, abstain}, and/or fed as soft votes, so the label model gets more than 8 distinct posteriors (fixes B10).
 
 Both are small enough to build in 1–2 days each, and both can be tested (E11, E6).
+
+## Results log
+
+### E1 leakage audit (2026-10-22, `scripts/make_splits.py` -> `results/E1/split_stats.json`)
+- 484 labeled locations with a defined label -> dev 150 (53.3% positive) / test 334 (53.0%), 1 km blocks, seed 0. 64 labeled locations have no defined label (`labeled_null`, includes tile 547 with no scores).
+- **The pool and the labeled set are spatially disjoint:** the nearest pool location to any labeled location is 1.8 km away (median 8.3 km). The 256 m exclusion buffer therefore removes **0** pool locations; there is no proximity leakage between pool pseudo-labels and the evaluation set. Report this as a finding, and keep the buffer in the code.
+- Dev/test are separated by whole blocks, but locations on either side of a block border can be close: the closest dev-test pair is 27 m, 5% of dev locations have a test location within 66 m (median 0.8 km). Open item: keep as is (and say so), or add a dev-test buffer (costs test size). Default: keep, report.
+- Pool prevalence vs test prevalence (B11) is not addressed by this; see D-4.

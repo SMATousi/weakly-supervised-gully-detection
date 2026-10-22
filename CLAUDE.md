@@ -28,7 +28,10 @@ Pipeline: open-weight VLMs label ~18k unlabeled locations (8 images each: 7 NAIP
 - D1 skeleton done: `pyproject.toml` (extras: vlm, student, ws, wandb, dev), `src/gully/` packages, `configs/` dirs, ruff+pytest CI, `uv venv .venv`. Heavy deps are extras, not installed yet.
 - `scripts/build_gt.py` + `gully/data/gt.py` done: all 4 GT schemes reproduce the legacy majority files exactly (257/227 main); rules in `spec/01-code-audit.md` §5. Old repo is at `/root/Gully_Detection` on this machine; raw scores copied to `data/gt_raw/` (annotators by role).
 - `scripts/build_index.py` done (run in a cluster pod; slow on CephFS, needs a process pool). `artifacts/index/locations.parquet` (18,727 rows) is local only (git-ignored); data facts in `spec/01-code-audit.md` §6 (alpha band, 59 truncated high-res tiles, variable high-res sizes).
-- Next: `legacy.py` ingestion, B3 check (wandb), `make_splits.py`; copy the index to a writable PVC dir for cluster jobs.
+- `legacy.py` + `scripts/ingest_legacy.py` done: 6 legacy labelers as JSONL in `artifacts/labels/`; audit accuracies (0.653 / 0.607 / 0.568 at cov 0.876) reproduce exactly (`tests/test_legacy.py`).
+- `scripts/make_splits.py` done: dev 150 / test 334 / labeled_null 64; **E1: pool is >=1.8 km from every labeled location, so 0 pool locations excluded** (`results/E1/`). Closest dev-test pair 27 m (see `spec/03-experiments.md` results log).
+- B3 NOT verifiable locally (only a 2024-07 wandb run exists); needs the user's wandb project.
+- Next: E0 (legacy LFs -> Snorkel with Y_dev=test vs dev prior -> fixed), `ws/label_matrix.py`, `ws/label_models.py`; copy the index to a writable PVC dir for cluster jobs; D-4 annotation sample list.
 
 ## First things to do on the data machine
 1. Locate the data (pool tiles, test tiles, DEM tiles from `dem2so`) and the old repo; check GPU types/memory (`nvidia-smi`). Record them in `configs/data.yaml` and in this file.

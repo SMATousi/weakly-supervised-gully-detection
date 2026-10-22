@@ -19,7 +19,7 @@ Owner key: **C** = Claude (code, analysis, drafting), **H** = human only (data h
 | D1 | Give access to the data host; confirm GPU memory (A100 40 vs 80 GB); confirm DEM coverage of the 3 pool HUC12s | H | Paths in `configs/data.yaml` |
 | D1–D2 | `build_index.py` (roles by filename, prefixed ids), `build_gt.py` (4 schemes, majority, κ), `legacy.py` ingestion | C | Index has 18,179 pool + 484 labeled rows; GT counts match 01-audit §3 |
 | D2 | **Verify B1** (which image is high-res at index 1) and **B3** (how 0.70 was picked) | C+H | Written answer in 01-audit |
-| D2 | `make_splits.py`: spatially blocked dev/test, 256 m pool exclusion (E1) | C | Split stats committed |
+| D2 | `make_splits.py`: spatially blocked dev/test, 256 m pool exclusion (E1) | C | Split stats committed. **Done 2026-10-22** |
 | D2–D3 | `labelers/vlm.py` on vLLM: multi-image + collage modes, JSON output, P(yes), resumable JSONL | C | Throughput measured on 50 locations |
 | D3 | **E0** reproduce the old pipeline from legacy labels; then with B2/B4/B5 fixed | C | Old vs fixed numbers in `results/E0` |
 | D3 | **Gate G1** | H+C | Pipeline reproduces; leakage quantified; go/no-go on split design |
