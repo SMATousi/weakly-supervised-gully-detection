@@ -65,7 +65,8 @@ Owner: **C** Claude, **H** human, **GPU** unattended job.
 - [x] C: `evaluate.py` (only reader of test labels; bootstrap CIs, McNemar), toy-tested
 - [x] C: `fit_label_model.py` (pseudo-labels with a dev-only class prior) and `run_grid.py` (many students from one GPU-resident copy of the features)
 - [ ] C: `predict_student.py` (scores for dev / test locations from a saved model)
-- [ ] C: **E7** and **E11** on legacy labels for early signal (seeds x heads): first grid (4 pseudo-label sets x 3 heads x 1 seed) running as `gully-train-grid`
+- [x] C: **E7** and **E11** on legacy labels, first pass (4 pseudo-label sets x 3 heads x 1 seed): done, see `03-experiments.md` results log
+- [ ] C: repeat with 5 seeds + bootstrap CIs and a dev-chosen threshold
 - [ ] H+C: **Gate G2**: new labelers beat or diversify the old set on dev? temporal head >= linear head on dev?
 
 **D-4 prevalence annotation**

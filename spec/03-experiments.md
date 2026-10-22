@@ -74,3 +74,23 @@ Both are small enough to build in 1–2 days each, and both can be tested (E11, 
 - Majority vote of the same 3 LFs: dev acc 0.667, F1 0.719, PR-AUC 0.690 (about the same as Snorkel). Single LFs on dev: Llama-90B multi-question 0.556 (cov 0.90), Llama-90B single 0.647, Qwen-72B single 0.673, so Snorkel is no better than the best single LF on dev (0.673 = 0.673).
 - B10 confirmed: the label model yields 7-8 distinct posteriors.
 - Still to do for E0: the student with the legacy code path vs the fixed one (needs `student/`).
+
+### E7 / E11 early signal on legacy labels (2026-10-22; `scripts/run_grid.py`, `results/E_early_legacy/`)
+Setup: FlexiViT-S frozen features (NAIP 128 px / patch 16; high-res resized to 512 px / patch 64; 75 truncated or unreadable high-res images masked), pool train n=18,179, scored on **dev only** (n=150, threshold 0.5, epoch selected on dev PR-AUC), **one seed**, 30 epochs, AdamW lr 1e-3. No test labels were read.
+
+| Pseudo-labels | Head | Dev acc | F1 | ROC-AUC | PR-AUC |
+|---|---|---|---|---|---|
+| Snorkel soft | linear (legacy-style) | 0.653 | 0.694 | 0.668 | 0.689 |
+| Snorkel soft | mean-pool MLP | 0.680 | 0.753 | 0.685 | 0.695 |
+| Snorkel soft | temporal attention | 0.667 | 0.725 | 0.707 | **0.752** |
+| Snorkel hard | linear / MLP / temporal | 0.600 / 0.600 / 0.620 | 0.605 / 0.583 / 0.601 | 0.655 / 0.695 / 0.695 | 0.696 / 0.708 / 0.731 |
+| MV hard | linear / MLP / temporal | 0.600 / 0.687 / 0.620 | 0.600 / 0.740 / 0.632 | 0.661 / 0.695 / 0.710 | 0.695 / 0.706 / 0.745 |
+| Qwen-72B only (hard) | linear / MLP / temporal | 0.653 / 0.687 / 0.593 | 0.720 / 0.768 / 0.690 | 0.690 / 0.654 / 0.613 | 0.673 / 0.620 / 0.656 |
+
+Reference on dev: Snorkel label model acc 0.673 / F1 0.726 / PR-AUC 0.710; Qwen-72B alone acc 0.673; MV 0.667.
+
+What this does and does not show:
+- **No student clearly beats its teachers on dev** (best acc 0.687 vs 0.673). With n=150 one standard error on accuracy is ~0.04 and there is one seed, so none of the accuracy differences above are significant. Weak teachers (dev acc ~0.67) cap what distillation can reach.
+- **Suggestive, to be tested with 5 seeds + bootstrap:** (a) Snorkel *soft* labels beat *hard* labels on accuracy (0.667 avg vs 0.607) and F1 for all three heads; (b) the temporal head has the best PR-AUC in all three soft/MV groups (0.752 / 0.745 / 0.731, vs 0.69-0.71) but not better accuracy at threshold 0.5, so the gain is in ranking and may need a dev-chosen threshold; (c) the linear head peaks within the first 5 epochs (overfits its ~200k-dim input).
+- B10 matters here: Snorkel on 3 binary LFs gives only 7 distinct soft labels, yet soft still helped. More informative (confidence-valued) LFs should widen this gap.
+- Next: 5 seeds, a dev-chosen threshold, and the same grid on the new labelers once they exist.

@@ -35,8 +35,8 @@ spec:
                 --heads linear mlp temporal --seeds 0 --exp E_early_legacy \
                 --out /pvc/ali-vol-500g/gully/results --ckpt-dir /pvc/ali-vol-500g/gully/students
           resources:
-            limits: {nvidia.com/gpu: 1, cpu: "8", memory: 9Gi}
-            requests: {cpu: "6", memory: 7Gi}
+            limits: {nvidia.com/gpu: 1, cpu: "4", memory: 4800Mi}
+            requests: {cpu: "2", memory: 3Gi}
           volumeMounts:
             - {name: v500, mountPath: /pvc/ali-vol-500g}
       volumes:
