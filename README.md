@@ -1,0 +1,1 @@
+# weakly-supervised-gully-detection
