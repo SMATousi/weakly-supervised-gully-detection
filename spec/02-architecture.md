@@ -52,6 +52,9 @@ Tooling: Python ≥3.10, `uv` or a conda env pinned in `pyproject.toml`; `vllm`,
 | `img_highres` | str | MSDIS 15 cm |
 | `split` | str | `pool`, `pool_excluded`, `dev`, `test` |
 | `legacy_id` | str | old integer key, for ingesting old outputs |
+| `tile_width_m`, `naip_px`, `naip_res_m`, `highres_px`, `highres_res_m`, `highres_bands` | num | header facts used for QC (see 01-code-audit §6) |
+| `dem` | str | DEM tile filename (pool only) |
+| `pvc`, `img_dir`, `dem_dir` | str | where the files live; `img_*` columns are filenames relative to `img_dir` |
 
 ### Ground truth — `artifacts/gt/gt.parquet`
 `loc_id`, `annotator`, `image_role`, `score (0–4)`, plus derived `y_strict_neg`, `y_lenient_neg`, `y_lenient_pos`, `y_strict_pos` (majority over annotators, null when undefined), `y_main` = `y_strict_neg`.

@@ -67,3 +67,12 @@ The old repo has no script that produces `agg/*_labels*.json`; the per-annotator
 | `strict_pos` | `pos_strict` | some score 4 and >= 2 scores >= 3 | 0.557 | 103 / 385 |
 
 Majority: over annotators with a non-null vote; null if fewer than 2 votes or a tie. Of the 547 scored locations, 484 are non-null under the main scheme. Note `strict_neg` is the most permissive for "positive" and `strict_pos` the most conservative: the scheme names are legacy, so state the rule, not the name, in the paper.
+
+## 6. Data facts from the index (`scripts/build_index.py`, 2026-10-22)
+
+- Pool: 18,179 locations x 8 images, all with a DEM tile (so the terrain labeler E5 is feasible). Test dir: 548 locations x 8 (`rgb_0..6`, `rgb_11`); location `547` has no annotator scores, so 547 are scored, 484 non-null under the main GT.
+- All tiles are EPSG:6344 (UTM 15N, metres), so split distances can be computed directly.
+- NAIP: 128 x 128 px at 0.91-0.96 m/px, not exactly 1 m. Tile width is 108-122 m (pool 115-117 m), so the 256 m exclusion buffer is about 2.1-2.4 tile widths. Keep 256 m.
+- High-res (15 cm) native size varies: pool 764 px (9,063) or 780 px (9,025); test 720 / 782 / 817 px. The audit's "~853 px" was wrong. A fixed-size student input therefore needs a resize (B8 stays open), done explicitly and recorded.
+- High-res band count: pool always 4 (RGBA), test 3 (325) or 4 (223). **Drop the alpha band** when loading.
+- **59 pool locations have a truncated high-res image** (<500 px wide, as small as 15 px; tile at the edge of MSDIS coverage). Flag them (`highres_px`) and decide at feature extraction: mask the image or exclude those locations from the high-res experiments. The expert-labeled set has none.

@@ -7,11 +7,11 @@ spec:
   restartPolicy: Never
   containers:
     - name: shell
-      image: ubuntu:24.04
+      image: python:3.11-slim
       command: ["bash", "-c", "sleep 3600"]
       resources:
-        limits: {cpu: "1", memory: 2Gi}
-        requests: {cpu: "1", memory: 2Gi}
+        limits: {cpu: "2", memory: 4Gi}
+        requests: {cpu: "2", memory: 4Gi}
       volumeMounts:
         - {name: v1t, mountPath: /pvc/ali-vol-1tera, readOnly: true}
         - {name: v500, mountPath: /pvc/ali-vol-500g, readOnly: true}
