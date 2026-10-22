@@ -11,50 +11,88 @@ Owner key: **C** = Claude (code, analysis, drafting), **H** = human only (data h
 - Free-GPU counts are not visible to us; expect queueing. Submit the long VLM jobs early and make them resumable.
 - **Critical path: the full-pool VLM runs.** Everything else is minutes-scale once features are cached.
 
-## Week 1: foundation and long jobs (D1–D7)
+## Progress (updated 2026-10-22; `[x]` done, `[ ]` open, "(running)" = in progress)
 
-| Day | Task | Owner | Done when |
-|---|---|---|---|
-| D1 | Repo skeleton, env, configs (02-architecture) | C | `pip install -e .` works; CI lint. **Done 2026-10-22** |
-| D1 | Give access to the data host; confirm GPU memory (A100 40 vs 80 GB); confirm DEM coverage of the 3 pool HUC12s | H | Paths in `configs/data.yaml` |
-| D1–D2 | `build_index.py` (roles by filename, prefixed ids), `build_gt.py` (4 schemes, majority, κ), `legacy.py` ingestion | C | Index has 18,179 pool + 484 labeled rows; GT counts match 01-audit §3 |
-| D2 | **Verify B1** (which image is high-res at index 1) and **B3** (how 0.70 was picked) | C+H | Written answer in 01-audit |
-| D2 | `make_splits.py`: spatially blocked dev/test, 256 m pool exclusion (E1) | C | Split stats committed. **Done 2026-10-22** |
-| D2–D3 | `labelers/vlm.py` on vLLM: multi-image + collage modes, JSON output, P(yes), resumable JSONL | C | Throughput measured on 50 locations |
-| D3 | **E0** reproduce the old pipeline from legacy labels; then with B2/B4/B5 fixed | C | Old vs fixed numbers in `results/E0` |
-| D3 | **Gate G1** | H+C | Pipeline reproduces; leakage quantified; go/no-go on split design |
-| D3–D4 | E2 (collage vs multi-image) + **E3 dev screening** of 5–7 labelers | GPU | Dev metrics + pairwise error correlation |
-| D4 | Select the labelers for the full pool; launch the pool + test runs back-to-back | C+H, GPU | Queue running |
-| D4–D5 | `features.py`: extract frozen features (FlexiViT-S fixed, ViT-S, one RS foundation model) for pool+dev+test | GPU (A10) | Feature files + checksums |
-| D4–D6 | E4 CLIP labelers; E5 terrain labeler **only if** DEM is available | C | Dev metrics |
-| D5–D7 | `student/train.py` + `heads.py` (linear, mean-pool MLP, temporal attention); E7 and E11 on **legacy** labels for early signal | C | Seeds × heads run end-to-end |
-| D7 | **Gate G2**: do the new labelers beat or diversify the old set on dev? Is the temporal head ≥ the linear head on dev? | H+C | Decide the final LF set and head |
+**Waiting on H (blocks something):**
+- [ ] Give the annotators the D-4 bundle and tool (`ali-vol-500g:gully/annotation_d4.tar`, `results/D4/sample.csv`); all three should label the same 100 IDs. Must start by D5.
+- [ ] Legacy single-question prompt (not in the old repo), or confirm we use the new `sq_v1`.
+- [ ] wandb project / per-epoch test metrics export, to settle B3.
+- [ ] Official CVPR 2027 dates (replace the placeholder dates above).
+- [ ] Dev/test border: keep as is (closest pair 27 m) or add a buffer (see `03-experiments.md` results log).
 
-## Week 2: the experiment matrix (D8–D15)
+## Week 1: foundation and long jobs (D1-D7)
 
-| Day | Task | Owner |
-|---|---|---|
-| D8–D9 | Pool runs finish; build L; **E6** label models (binary vs confidence LFs) | GPU, C |
-| D9–D10 | **E7** WS vs distillation; **E11** heads, final LF set; 5 seeds each | C |
-| D10–D11 | **E10** ablations (backbone, resolution, dates); **E12** Reece-supervised + supervised CV upper bound | C |
-| D11–D12 | **E8** #LF curve; **E9** data scaling | C |
-| D12–D13 | E14 efficiency; E15 qualitative figures + attention maps; GT-robustness table | C, GPU |
-| D13–D14 | P2 items only if everything above is green: E13 self-training, Qwen3-VL-235B | C |
-| D14 | Final test evaluation: one `evaluate.py` run per final config; bootstrap CIs, McNemar | C |
-| D15 | **Gate G3, experiment freeze.** Tables regenerate from `results/` with one command | H+C |
+Owner: **C** Claude, **H** human, **GPU** unattended job.
 
-## Week 3: writing (D16–D21)
+**D1: skeleton and data**
+- [x] C: repo skeleton, `pyproject.toml`, configs, ruff + pytest CI (`pip install -e .` works)
+- [x] H: data host access; GPU memory confirmed (80 GB A100s on Nautilus); DEM covers all 18,179 pool locations; paths in `configs/data.yaml`
+- [x] C: `build_index.py` (roles by filename, prefixed ids): 18,179 pool + 548 labeled rows
+- [x] C: `build_gt.py` (4 schemes, majority, Fleiss kappa): matches the legacy files, 257 / 227
+- [x] C: `legacy.py` ingestion of 6 legacy labelers; reproduces the audit accuracies
 
-| Day | Task | Owner |
-|---|---|---|
-| D16 | CVPR template; restructure per 04-paper-revisions R0–R1; decide the title | C draft, H decide |
-| D16–D17 | Method + dataset sections (R3, R4); new pipeline figure | C draft, H review |
-| D17–D18 | Experiments + discussion with the new tables (R5, R6) | C draft, H review |
-| D18 | Related work expansion (R2) | C draft, H check citations |
-| D19 | Supplement: prompts, labeler configs, GT schemes, extra ablations; release README | C |
-| D19 | Register the abstract (if not already done) | H |
-| D20 | Full read-through by all authors; anonymity check (no links, no names in PDFs/metadata) | H |
-| D21 | Buffer, then submit | H |
+**D2: verification and splits**
+- [x] C: verify **B1** (high-res image never reached the high-res branch, in pool or test)
+- [ ] C+H: verify **B3** (how 0.70 was picked); blocked on the wandb export
+- [x] C: `make_splits.py`: dev 150 / test 334, 1 km blocks; **E1** done (pool is >= 1.8 km from every labeled location; 0 excluded)
+
+**D2-D3: labeler runner and E0**
+- [x] C: `labelers/vlm.py` (multi-image + collage, JSON output, P(yes), resumable JSONL); helpers unit-tested
+- [ ] C: run `vlm.py` on vLLM for real; measure throughput on 50 locations (needs a GPU job)
+- [ ] C: pin Hugging Face revisions in `configs/labelers/*.yaml`
+- [x] C: **E0, label-model step**: old pseudo-labels reproduced 100%; B4 leak barely matters; Snorkel = best single LF on dev
+- [ ] C: **E0, student step**: legacy-equivalent student vs fixed (B1/B2/B5/B7) on cached features
+- [ ] H+C: **Gate G1**: pipeline reproduces, leakage quantified, go/no-go on split design
+
+**D3-D4: labeler screening and launch**
+- [ ] GPU: **E2** collage vs multi-image (Qwen2.5-VL-72B on dev)
+- [ ] GPU: **E3 dev screening** of 5-7 labelers (+ pairwise error correlation)
+- [ ] C+H: select the labelers for the full pool
+- [ ] GPU: launch the pool + labeled-set runs back-to-back (queue running)
+
+**D4-D5: features**
+- [x] C: `student/features.py` + `scripts/extract_features.py` (tested; reads 8 files concurrently)
+- [ ] GPU: FlexiViT-S features for pool + labeled (running, 18,727 locations; smoke test passed)
+- [ ] GPU: ViT-S features (E10)
+- [ ] GPU: one RS foundation-model backbone (E10; cut-list item 4)
+
+**D4-D6: cheap labelers**
+- [ ] C: **E4** CLIP / RemoteCLIP / GeoRSCLIP labelers
+- [ ] C: **E5** terrain labeler from the DEM tiles (P2)
+
+**D5-D7: student**
+- [x] C: `student/heads.py` (linear, mean-pool MLP, temporal attention) and `train.py` (dev-based selection), toy-tested
+- [x] C: `evaluate.py` (only reader of test labels; bootstrap CIs, McNemar), toy-tested
+- [ ] C: `predict_student.py` (scores for dev / test locations from a saved model)
+- [ ] C: **E7** and **E11** on legacy labels for early signal (seeds x heads)
+- [ ] H+C: **Gate G2**: new labelers beat or diversify the old set on dev? temporal head >= linear head on dev?
+
+**D-4 prevalence annotation**
+- [x] C: sample 100 random pool locations (`results/D4/sample.csv`) and build the tool-ready bundle
+- [ ] H: annotators label the 100 locations
+- [ ] C: `build_gt.py` on the new scores; pool prevalence + realistic precision of the label model and student
+
+## Week 2: the experiment matrix (D8-D15)
+
+- [ ] D8-D9 GPU/C: pool runs finish; build L; **E6** label models (binary vs confidence-valued LFs)
+- [ ] D9-D10 C: **E7** WS vs distillation; **E11** heads with the final LF set; 5 seeds each
+- [ ] D10-D11 C: **E10** ablations (backbone, resolution, dates); **E12** Reece-supervised + supervised CV upper bound
+- [ ] D11-D12 C: **E8** #LF curve; **E9** data scaling
+- [ ] D12-D13 C/GPU: **E14** efficiency; **E15** qualitative figures + attention maps; GT-robustness table
+- [ ] D13-D14 C: P2 only if all green: E13 self-training, Qwen3-VL-235B
+- [ ] D14 C: final test evaluation: one `evaluate.py` run per final config; bootstrap CIs, McNemar
+- [ ] D15 H+C: **Gate G3, experiment freeze**; tables regenerate from `results/` with one command (`make_tables.py`, `eval/report.py` not written yet)
+
+## Week 3: writing (D16-D21)
+
+- [ ] D16 C draft, H decide: CVPR template; restructure per 04-paper-revisions R0-R1; decide the title
+- [ ] D16-D17 C draft, H review: method + dataset sections (R3, R4); new pipeline figure
+- [ ] D17-D18 C draft, H review: experiments + discussion with the new tables (R5, R6)
+- [ ] D18 C draft, H check citations: related work expansion (R2)
+- [ ] D19 C: supplement (prompts, labeler configs, GT schemes, extra ablations); release README
+- [ ] D19 H: register the abstract (if not already done)
+- [ ] D20 H: full read-through by all authors; anonymity check (no links, no names in PDFs/metadata)
+- [ ] D21 H: buffer, then submit
 
 ## Cut list (in order, when behind)
 1. E13 self-training, Qwen3-VL-235B

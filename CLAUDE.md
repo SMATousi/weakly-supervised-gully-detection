@@ -20,6 +20,7 @@ Pipeline: open-weight VLMs label ~18k unlabeled locations (8 images each: 7 NAIP
 - Paper (Overleaf-synced git repo, WACV 2026 kit): `/root/papers/weak-supervision-gully/68654fca3ff58f80fea5c916/wacv-2026-author-kit-template/`. Present on this machine; push access is configured via the remote URL (token stored in that repo's `.git/config`, never copy it elsewhere).
 
 ## Status as of 2026-10-22
+- **Progress checklist (what is done / open / waiting on the user): `spec/00-roadmap.md` → "Progress". Keep its checkboxes up to date in the same commit as the work.**
 - Done: paper review, cost/feasibility discussion, `spec/` written. **No code yet.**
 - Decisions made (see `Decision:` in `spec/00-roadmap.md`): D-1 fixed dev/test; D-2 buffer = 2 tile widths (128 px at 1 m, so 256 m); D-3 resolved: 80 GB A100s, original E3 list stands; D-4 ~100-location random-pool annotation approved (must start by D5; prepare the annotation set early); D-5 decide later. Official CVPR 2027 dates still pending.
 - Data located and recorded in `configs/data.yaml`; B1 confirmed from filenames. Cluster access works (`export PATH="$HOME/.krew/bin:$PATH"`; manifests in `cluster/`).

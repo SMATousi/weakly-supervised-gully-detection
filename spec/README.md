@@ -20,7 +20,7 @@ This folder is the single source of truth for the 3-week revision. Read in order
 
 ## Status
 
-- [ ] Kickoff approved
+- [x] Kickoff approved
 - [ ] Gate G1: Baseline reproduced in the new repo, bugs fixed, leakage checked (end of D3)
 - [ ] Gate G2: New labelers add value on dev (end of D7)
 - [ ] Gate G3: Experiment freeze (end of D15)
