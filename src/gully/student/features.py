@@ -8,6 +8,7 @@ audit B1). Output layout under <out>/<backbone>/:
 """
 from __future__ import annotations
 
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import numpy as np
@@ -20,11 +21,20 @@ from torch.utils.data import DataLoader, Dataset
 ROLES = [f"naip_{i}" for i in range(7)] + ["highres"]
 
 
-def read_rgb(path: str | Path) -> np.ndarray:
-    """uint8 (H, W, 3); alpha band dropped (high-res tiles are RGBA)."""
-    with rasterio.open(path) as src:
+def decode_rgb(data: bytes) -> np.ndarray:
+    """uint8 (H, W, 3) from GeoTIFF bytes; alpha band dropped (high-res tiles are RGBA)."""
+    with rasterio.io.MemoryFile(data) as mf, mf.open() as src:
         arr = src.read([1, 2, 3])
     return np.moveaxis(arr, 0, -1)
+
+
+def read_bytes(path: str | Path) -> bytes:
+    with open(path, "rb") as f:
+        return f.read()
+
+
+def read_rgb(path: str | Path) -> np.ndarray:
+    return decode_rgb(read_bytes(path))
 
 
 class LocationImages(Dataset):
@@ -53,17 +63,27 @@ class LocationImages(Dataset):
         d = Path(self.roots[r["pvc"]]) / r["img_dir"]
         valid = np.ones(8, dtype=bool)
         naip = torch.zeros(7, 3, 128, 128)
+        paths = [d / r[f"img_naip_{k}"] for k in range(7)] + [d / r["img_highres"]]
+        with ThreadPoolExecutor(8) as ex:  # network volume: latency bound, so read the 8 files at once
+            blobs = list(ex.map(self._try_read, paths))
         for k in range(7):
-            try:
-                naip[k] = self._norm(read_rgb(d / r[f"img_naip_{k}"]), 128)
-            except rasterio.errors.RasterioIOError:  # unreadable -> masked, zeros
+            if blobs[k] is None:  # unreadable -> masked, zeros
                 valid[k] = False
-        try:
-            hr = self._norm(read_rgb(d / r["img_highres"]), self.S)
-            valid[7] = r["highres_px"] >= self.min_highres_px  # truncated tiles at coverage edges
-        except rasterio.errors.RasterioIOError:
+            else:
+                naip[k] = self._norm(decode_rgb(blobs[k]), 128)
+        if blobs[7] is None:
             hr, valid[7] = torch.zeros(3, self.S, self.S), False
+        else:
+            hr = self._norm(decode_rgb(blobs[7]), self.S)
+            valid[7] = r["highres_px"] >= self.min_highres_px  # truncated tiles at coverage edges
         return naip, hr, torch.from_numpy(valid)
+
+    @staticmethod
+    def _try_read(path) -> bytes | None:
+        try:
+            return read_bytes(path)
+        except OSError:
+            return None
 
 
 def load_backbone(name: str, img_size: int, patch_size: int, device: str):
@@ -95,7 +115,7 @@ def extract(index: pd.DataFrame, roots: dict[str, str], out_dir: str | Path, bac
         tok[pos:pos + b] = torch.cat([f_naip, f_hr], 1).half().cpu().numpy()
         valid_all[pos:pos + b] = valid.numpy()
         pos += b
-        if (pos // batch_size) % 50 == 0:
+        if (pos // batch_size) % 10 == 0:
             print(f"{pos}/{n}", flush=True)
     tok.flush()
     np.save(out / "valid.npy", valid_all)

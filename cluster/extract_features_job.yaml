@@ -29,12 +29,12 @@ spec:
               (apt-get update -qq && apt-get install -y -qq libexpat1) >/dev/null 2>&1 || true
               pip install -q timm rasterio pandas pyarrow scipy scikit-learn pyyaml
               pip install -q -e . --no-deps
-              ARGS="--index artifacts/index/locations.parquet --pvc-root ali-vol-500g=/pvc/ali-vol-500g --pvc-root ali-vol-1tera=/pvc/ali-vol-1tera --out /pvc/ali-vol-500g/gully/features --workers 8 --batch-size 16"
+              ARGS="--index artifacts/index/locations.parquet --pvc-root ali-vol-500g=/pvc/ali-vol-500g --pvc-root ali-vol-1tera=/pvc/ali-vol-1tera --out /pvc/ali-vol-500g/gully/features --workers 16 --batch-size 16"
               python scripts/extract_features.py $ARGS --tag flexivit_s_smoke --limit 64
               python scripts/extract_features.py $ARGS --tag flexivit_s
           resources:
-            limits: {nvidia.com/gpu: 1, cpu: "8", memory: 9Gi}
-            requests: {cpu: "6", memory: 7Gi}
+            limits: {nvidia.com/gpu: 1, cpu: "12", memory: 14Gi}
+            requests: {cpu: "8", memory: 10Gi}
           volumeMounts:
             - {name: v500, mountPath: /pvc/ali-vol-500g}
             - {name: v1t, mountPath: /pvc/ali-vol-1tera, readOnly: true}
