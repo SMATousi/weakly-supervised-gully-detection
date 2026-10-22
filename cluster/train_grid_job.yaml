@@ -17,9 +17,9 @@ spec:
                   - key: kubernetes.io/hostname
                     operator: NotIn
                     values: [k8s-haosu-12.sdsc.optiputer.net]   # GPU lost, rejects pods
-                  - key: nvidia.com/gpu.product                 # A100 only (user decision); only extraction may use any GPU
-                    operator: In
-                    values: [NVIDIA-A100-SXM4-80GB, NVIDIA-A100-80GB-PCIe, NVIDIA-A100-PCIE-40GB]
+                  - key: nvidia.com/gpu.memory                  # any GPU that fits (user decision, 2026-10-22)
+                    operator: Gt
+                    values: ["20000"]                           # features (7.3 GB) + activations must fit
       containers:
         - name: train
           image: pytorch/pytorch:2.5.1-cuda12.4-cudnn9-runtime
