@@ -5,13 +5,13 @@ probabilities / checkpoints under artifacts/students/. Reads NO test labels.
 """
 import argparse
 import json
-import subprocess
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 import torch
 
+from gully.config import git_sha
 from gully.student.train import load_features, to_device, train_student
 
 
@@ -43,8 +43,7 @@ def main() -> None:
     V_pool = valid[[pos[i] for i in pool_ids]]
     X_dev = to_device(tok, [pos[i] for i in dev_ids], a.device)
     V_dev = valid[[pos[i] for i in dev_ids]]
-    sha = subprocess.run(["git", "rev-parse", "--short", "HEAD"], check=False, capture_output=True,
-                         text=True).stdout.strip()
+    sha = git_sha()
     out, ck = Path(a.out) / a.exp, Path(a.ckpt_dir)
     out.mkdir(parents=True, exist_ok=True)
     ck.mkdir(parents=True, exist_ok=True)

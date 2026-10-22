@@ -5,13 +5,13 @@ artifacts/students/) so scripts/evaluate.py can score the final configuration on
 """
 import argparse
 import json
-import subprocess
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 import torch
 
+from gully.config import git_sha
 from gully.student.train import load_features, train_student
 
 
@@ -53,8 +53,7 @@ def main() -> None:
     ck.mkdir(parents=True, exist_ok=True)
     torch.save(model.state_dict(), ck / f"{a.exp}__{a.run}.pt")
     np.save(ck / f"{a.exp}__{a.run}__dev_p1.npy", p_dev)
-    sha = subprocess.run(["git", "rev-parse", "--short", "HEAD"], check=False, capture_output=True,
-                         text=True).stdout.strip()
+    sha = git_sha()
     res = {"run": a.run, "args": vars(a), "git": sha, "n_train": len(tr_ids), "n_dev": len(dev_ids),
            "best_epoch": best_ep, "dev": hist[best_ep], "history": hist}
     (out / f"{a.run}.json").write_text(json.dumps(res, indent=2))
