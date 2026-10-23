@@ -25,6 +25,7 @@ student = ["torch", "timm"]
 ws = ["snorkel", "flyingsquid"]
 wandb = ["wandb"]
 dev = ["pytest", "ruff"]
+client = ["openai"]
 
 [tool.setuptools.packages.find]
 where = ["src"]

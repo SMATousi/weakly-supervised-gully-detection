@@ -127,8 +127,7 @@ def make_record(loc_id: str, cfg: dict, text: str, p_yes: float | None, latency:
             "ts": time.strftime("%Y-%m-%dT%H:%M:%S")}
 
 
-def run(cfg: dict, prompt: dict, locations, load_arrays, out_path: str | Path, chunk: int = 64) -> None:
-    """locations: iterable of loc_id; load_arrays(loc_id) -> 8 uint8 RGB arrays. Resumable."""
+def _engine(cfg: dict):
     from vllm import LLM, SamplingParams
 
     try:  # vLLM >= 0.11 renamed guided decoding to structured outputs
@@ -139,27 +138,42 @@ def run(cfg: dict, prompt: dict, locations, load_arrays, out_path: str | Path, c
         from vllm.sampling_params import GuidedDecodingParams
 
         constraint = {"guided_decoding": GuidedDecodingParams(json=ANSWER_SCHEMA)}
-
-    out_path = Path(out_path)
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-    todo = [i for i in locations if i not in done_ids(out_path)]
     llm = LLM(model=cfg["model"], revision=cfg.get("revision"), tensor_parallel_size=cfg.get("tp", 1),
               max_model_len=cfg.get("max_model_len", 8192), dtype=cfg.get("dtype", "bfloat16"),
               limit_mm_per_prompt={"image": 8}, gpu_memory_utilization=cfg.get("gpu_mem_util", 0.9),
               trust_remote_code=cfg.get("trust_remote_code", False), seed=cfg.get("seed", 0),
               **cfg.get("llm_kwargs", {}))
-    sp = SamplingParams(temperature=0.0, max_tokens=48, logprobs=20, **constraint)
-    with open(out_path, "a") as f:
-        for s in range(0, len(todo), chunk):
-            ids = todo[s:s + chunk]
-            msgs = [build_messages(prep_images(load_arrays(i), cfg["naip_size"], cfg["highres_size"]),
-                                   prompt, cfg["image_mode"]) for i in ids]
-            t0 = time.time()
-            outs = llm.chat(msgs, sp)
-            lat = (time.time() - t0) / len(ids)
-            for i, o in zip(ids, outs, strict=True):
-                c = o.outputs[0]
-                toks = [next(iter(lp.values())).decoded_token or "" for lp in c.logprobs]
-                tops = [{v.decoded_token or "": v.logprob for v in lp.values()} for lp in c.logprobs]
-                f.write(json.dumps(make_record(i, cfg, c.text, p_yes_from_logprobs(c.text, toks, tops), lat)) + "\n")
-            f.flush()
+    return llm, SamplingParams(temperature=0.0, max_tokens=48, logprobs=20, **constraint)
+
+
+def run_many(cfg: dict, prompt: dict, tasks: list[tuple[list[str], str | Path]], load_arrays,
+             chunk: int = 64) -> None:
+    """Load the model ONCE, then label every task = (loc_ids, out_path). Each output is resumable."""
+    todo = []
+    for ids, out_path in tasks:
+        Path(out_path).parent.mkdir(parents=True, exist_ok=True)
+        done = done_ids(out_path)
+        todo.append(([i for i in ids if i not in done], Path(out_path)))
+    if not any(t[0] for t in todo):
+        return
+    llm, sp = _engine(cfg)
+    for ids_todo, out_path in todo:
+        with open(out_path, "a") as f:
+            for s in range(0, len(ids_todo), chunk):
+                ids = ids_todo[s:s + chunk]
+                msgs = [build_messages(prep_images(load_arrays(i), cfg["naip_size"], cfg["highres_size"]),
+                                       prompt, cfg["image_mode"]) for i in ids]
+                t0 = time.time()
+                outs = llm.chat(msgs, sp)
+                lat = (time.time() - t0) / len(ids)
+                for i, o in zip(ids, outs, strict=True):
+                    c = o.outputs[0]
+                    toks = [next(iter(lp.values())).decoded_token or "" for lp in c.logprobs]
+                    tops = [{v.decoded_token or "": v.logprob for v in lp.values()} for lp in c.logprobs]
+                    f.write(json.dumps(make_record(i, cfg, c.text, p_yes_from_logprobs(c.text, toks, tops),
+                                                   lat)) + "\n")
+                f.flush()
+
+
+def run(cfg: dict, prompt: dict, locations, load_arrays, out_path: str | Path, chunk: int = 64) -> None:
+    run_many(cfg, prompt, [(list(locations), out_path)], load_arrays, chunk)

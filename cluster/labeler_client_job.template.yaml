@@ -1,0 +1,36 @@
+# CPU-only labeling client for the persistent server (cluster/vlm_deployment.yaml); fill via cluster/submit_client.sh.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: __JOB__
+spec:
+  backoffLimit: 6
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: client
+          image: python:3.11-slim
+          workingDir: /pvc/ali-vol-500g/gully/code
+          command: ["bash", "-c"]
+          args:
+            - |
+              set -e
+              (apt-get update -qq && apt-get install -y -qq libexpat1) >/dev/null 2>&1 || true
+              pip install -q openai rasterio pandas pyarrow pyyaml pillow scipy 2>&1 | tail -1
+              pip install -q -e . --no-deps
+              python scripts/run_labeler.py --config configs/labelers/__CONFIG__.yaml --set __SETS__ __EXTRA__ \
+                --server http://gully-vlm:8000/v1 --concurrency 32 \
+                --pvc-root ali-vol-500g=/pvc/ali-vol-500g --pvc-root ali-vol-1tera=/pvc/ali-vol-1tera \
+                --out /pvc/ali-vol-500g/gully/labels
+          resources:
+            limits: {cpu: "8", memory: 9Gi}
+            requests: {cpu: "8", memory: 9Gi}
+          volumeMounts:
+            - {name: v500, mountPath: /pvc/ali-vol-500g}
+            - {name: v1t, mountPath: /pvc/ali-vol-1tera, readOnly: true}
+      volumes:
+        - name: v500
+          persistentVolumeClaim: {claimName: ali-vol-500g}
+        - name: v1t
+          persistentVolumeClaim: {claimName: ali-vol-1tera, readOnly: true}

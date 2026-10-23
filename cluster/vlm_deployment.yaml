@@ -1,0 +1,75 @@
+# Persistent vLLM server (OpenAI-compatible) on 2 GPUs, kept warm so labeling jobs never reload weights or
+# queue for GPUs. Allowed by the cluster policy (user, 2026-10-23). Change the model by editing MODEL below and
+# re-applying (strategy Recreate reloads it). Clients: cluster/submit_client.sh, URL http://gully-vlm:8000/v1
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gully-vlm
+  labels: {app: gully-vlm}
+spec:
+  replicas: 1
+  strategy: {type: Recreate}
+  selector:
+    matchLabels: {app: gully-vlm}
+  template:
+    metadata:
+      labels: {app: gully-vlm}
+    spec:
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:   # soft: avoid nodes with broken GPUs, never forbid
+            - weight: 100
+              preference:
+                matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: NotIn
+                    values: [k8s-haosu-12.sdsc.optiputer.net, nautilus-ext-gpu01.fullerton.edu]
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: nvidia.com/gpu.memory     # 66 GB of weights over 2 cards + KV cache
+                    operator: Gt
+                    values: ["38000"]
+      containers:
+        - name: vllm
+          image: vllm/vllm-openai:latest
+          command: ["vllm", "serve", "Qwen/Qwen3-VL-32B-Instruct"]   # MODEL
+          args:
+            - --served-model-name=Qwen/Qwen3-VL-32B-Instruct         # must equal `model:` in configs/labelers/*.yaml
+            - --tensor-parallel-size=2
+            - --max-model-len=8192
+            - --gpu-memory-utilization=0.9
+            - --max-num-seqs=32
+            - --limit-mm-per-prompt={"image":8}
+            - --host=0.0.0.0
+            - --port=8000
+          env:
+            - {name: HF_HOME, value: /pvc/ali-vol-500g/gully/hf}
+            - {name: VLLM_WORKER_MULTIPROC_METHOD, value: spawn}
+          ports: [{containerPort: 8000}]
+          startupProbe:                    # loading 66 GB from the shared volume takes a long time
+            httpGet: {path: /health, port: 8000}
+            periodSeconds: 30
+            failureThreshold: 240
+          readinessProbe:
+            httpGet: {path: /health, port: 8000}
+            periodSeconds: 30
+          resources:
+            limits: {nvidia.com/gpu: 2, cpu: "12", memory: 14Gi}
+            requests: {cpu: "12", memory: 14Gi}
+          volumeMounts:
+            - {name: v500, mountPath: /pvc/ali-vol-500g}
+            - {name: shm, mountPath: /dev/shm}
+      volumes:
+        - name: v500
+          persistentVolumeClaim: {claimName: ali-vol-500g}
+        - name: shm
+          emptyDir: {medium: Memory, sizeLimit: 16Gi}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gully-vlm
+spec:
+  selector: {app: gully-vlm}
+  ports: [{port: 8000, targetPort: 8000}]
