@@ -163,6 +163,10 @@ def run_many(cfg: dict, prompt: dict, tasks: list[tuple[list[str], str | Path]],
                 ids = ids_todo[s:s + chunk]
                 msgs = [build_messages(prep_images(load_arrays(i), cfg["naip_size"], cfg["highres_size"]),
                                        prompt, cfg["image_mode"]) for i in ids]
+                if cfg.get("image_url_parts"):  # mistral-common rejects `image_pil`; it takes image_url data URLs
+                    from gully.labelers.vlm_client import to_api_messages
+
+                    msgs = [to_api_messages(m) for m in msgs]
                 t0 = time.time()
                 outs = llm.chat(msgs, sp)
                 lat = (time.time() - t0) / len(ids)
