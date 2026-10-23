@@ -72,7 +72,8 @@ Owner: **C** Claude, **H** human, **GPU** unattended job.
 **D-4 prevalence annotation**
 - [x] C: sample 100 random pool locations (`results/D4/sample.csv`) and build the tool-ready bundle
 - [ ] H: annotators label the 100 locations
-- [ ] C: `build_gt.py` on the new scores; pool prevalence + realistic precision of the label model and student
+- [x] C: `scripts/analyze_d4.py` ready (prevalence with Wilson CI under all 4 GT schemes; metrics of any pseudo-label / score file against the new labels); tested on synthetic annotations
+- [ ] C: run `analyze_d4.py` on the real annotations once they exist
 
 ## Week 2: the experiment matrix (D8-D15)
 
@@ -84,7 +85,7 @@ Owner: **C** Claude, **H** human, **GPU** unattended job.
 - [ ] D12-D13 C/GPU: **E14** efficiency; **E15** qualitative figures + attention maps; GT-robustness table
 - [ ] D13-D14 C: P2 only if all green: E13 self-training, Qwen3-VL-235B
 - [ ] D14 C: final test evaluation: one `evaluate.py` run per final config; bootstrap CIs, McNemar
-- [ ] D15 H+C: **Gate G3, experiment freeze**; tables regenerate from `results/` with one command (`make_tables.py`, `eval/report.py` not written yet)
+- [ ] D15 H+C: **Gate G3, experiment freeze**; tables regenerate from `results/` with one command (`scripts/make_tables.py`, `eval/report.py` written; main test table plugs in once `results/final/*.json` exist)
 
 ## Week 3: writing (D16-D21)
 
