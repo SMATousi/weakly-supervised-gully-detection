@@ -12,16 +12,12 @@ spec:
       restartPolicy: Never
       affinity:
         nodeAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:   # soft: avoid nodes with broken GPUs, never forbid
-            - weight: 100
-              preference:
-                matchExpressions:
-                  - key: kubernetes.io/hostname
-                    operator: NotIn
-                    values: [k8s-haosu-12.sdsc.optiputer.net, nautilus-ext-gpu01.fullerton.edu, k8s-chase-ci-01.calit2.optiputer.net]
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
               - matchExpressions:
+                  - key: kubernetes.io/hostname      # verified broken: pods are rejected at admission, so they are not capacity
+                    operator: NotIn
+                    values: [k8s-haosu-12.sdsc.optiputer.net, nautilus-ext-gpu01.fullerton.edu, k8s-chase-ci-01.calit2.optiputer.net]
       containers:
         - name: extract
           image: pytorch/pytorch:2.5.1-cuda12.4-cudnn9-runtime
