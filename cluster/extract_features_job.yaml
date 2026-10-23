@@ -17,7 +17,7 @@ spec:
               - matchExpressions:
                   - key: kubernetes.io/hostname
                     operator: NotIn
-                    values: [k8s-haosu-12.sdsc.optiputer.net]   # GPU lost, rejects pods (2026-10-22)
+                    values: [k8s-haosu-12.sdsc.optiputer.net, nautilus-ext-gpu01.fullerton.edu]   # broken GPUs: reject pods at admission (2026-10-22/23)
       containers:
         - name: extract
           image: pytorch/pytorch:2.5.1-cuda12.4-cudnn9-runtime

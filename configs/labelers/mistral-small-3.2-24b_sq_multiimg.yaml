@@ -1,0 +1,12 @@
+name: mistral-small-3.2-24b_sq_multiimg
+model: mistralai/Mistral-Small-3.2-24B-Instruct-2506
+revision: null            # pin the HF commit sha before the full-pool run (record it in the JSONL)
+tp: 1
+max_model_len: 8192
+dtype: bfloat16
+image_mode: multi_image   # multi_image | collage
+naip_size: 224            # NAIP 128 px upsampled (bicubic) to this
+highres_size: 672         # 15 cm tile resized (Lanczos) to this
+prompt_file: configs/prompts/single_question.yaml
+prompt_id: sq_v1
+seed: 0

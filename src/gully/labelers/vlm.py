@@ -130,17 +130,24 @@ def make_record(loc_id: str, cfg: dict, text: str, p_yes: float | None, latency:
 def run(cfg: dict, prompt: dict, locations, load_arrays, out_path: str | Path, chunk: int = 64) -> None:
     """locations: iterable of loc_id; load_arrays(loc_id) -> 8 uint8 RGB arrays. Resumable."""
     from vllm import LLM, SamplingParams
-    from vllm.sampling_params import GuidedDecodingParams
+
+    try:  # vLLM >= 0.11 renamed guided decoding to structured outputs
+        from vllm.sampling_params import StructuredOutputsParams
+
+        constraint = {"structured_outputs": StructuredOutputsParams(json=ANSWER_SCHEMA)}
+    except ImportError:
+        from vllm.sampling_params import GuidedDecodingParams
+
+        constraint = {"guided_decoding": GuidedDecodingParams(json=ANSWER_SCHEMA)}
 
     out_path = Path(out_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     todo = [i for i in locations if i not in done_ids(out_path)]
     llm = LLM(model=cfg["model"], revision=cfg.get("revision"), tensor_parallel_size=cfg.get("tp", 1),
-              max_model_len=cfg.get("max_model_len", 16384), dtype=cfg.get("dtype", "bfloat16"),
+              max_model_len=cfg.get("max_model_len", 8192), dtype=cfg.get("dtype", "bfloat16"),
               limit_mm_per_prompt={"image": 8}, gpu_memory_utilization=cfg.get("gpu_mem_util", 0.9),
               trust_remote_code=cfg.get("trust_remote_code", False), seed=cfg.get("seed", 0))
-    sp = SamplingParams(temperature=0.0, max_tokens=48, logprobs=20,
-                        guided_decoding=GuidedDecodingParams(json=ANSWER_SCHEMA))
+    sp = SamplingParams(temperature=0.0, max_tokens=48, logprobs=20, **constraint)
     with open(out_path, "a") as f:
         for s in range(0, len(todo), chunk):
             ids = todo[s:s + chunk]

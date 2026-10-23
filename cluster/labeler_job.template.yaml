@@ -1,0 +1,51 @@
+# vLLM labeler job template; fill with cluster/submit_labeler.sh. Output JSONL goes to the PVC.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: __JOB__
+spec:
+  backoffLimit: 10   # admission rejections from flaky nodes count as failures
+  template:
+    spec:
+      restartPolicy: Never
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: NotIn
+                    values: [k8s-haosu-12.sdsc.optiputer.net, nautilus-ext-gpu01.fullerton.edu]   # broken GPUs: reject pods at admission (2026-10-22/23)
+                  - key: nvidia.com/gpu.memory
+                    operator: Gt
+                    values: ["__MINMEM__"]
+      containers:
+        - name: vlm
+          image: vllm/vllm-openai:latest
+          workingDir: /pvc/ali-vol-500g/gully/code
+          command: ["bash", "-c"]
+          args:
+            - |
+              set -e
+              pip install -q rasterio pandas pyarrow pyyaml pillow scipy 2>&1 | tail -1
+              pip install -q -e . --no-deps
+              python3 scripts/run_labeler.py --config configs/labelers/__CONFIG__.yaml --set __SET__ __EXTRA__ \
+                --pvc-root ali-vol-500g=/pvc/ali-vol-500g --pvc-root ali-vol-1tera=/pvc/ali-vol-1tera \
+                --out /pvc/ali-vol-500g/gully/labels
+          env:
+            - {name: HF_HOME, value: /pvc/ali-vol-500g/gully/hf}
+            - {name: VLLM_WORKER_MULTIPROC_METHOD, value: spawn}
+          resources:
+            limits: {nvidia.com/gpu: __GPUS__, cpu: "__CPU__", memory: __MEM__Gi}
+            requests: {cpu: "__CPUREQ__", memory: __MEMREQ__Gi}
+          volumeMounts:
+            - {name: v500, mountPath: /pvc/ali-vol-500g}
+            - {name: v1t, mountPath: /pvc/ali-vol-1tera, readOnly: true}
+            - {name: shm, mountPath: /dev/shm}
+      volumes:
+        - name: v500
+          persistentVolumeClaim: {claimName: ali-vol-500g}
+        - name: v1t
+          persistentVolumeClaim: {claimName: ali-vol-1tera, readOnly: true}
+        - name: shm
+          emptyDir: {medium: Memory, sizeLimit: 16Gi}

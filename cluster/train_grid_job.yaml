@@ -16,7 +16,7 @@ spec:
               - matchExpressions:
                   - key: kubernetes.io/hostname
                     operator: NotIn
-                    values: [k8s-haosu-12.sdsc.optiputer.net]   # GPU lost, rejects pods
+                    values: [k8s-haosu-12.sdsc.optiputer.net, nautilus-ext-gpu01.fullerton.edu]   # broken GPUs: reject pods at admission (2026-10-22/23)
                   - key: nvidia.com/gpu.memory                  # any GPU that fits (user decision, 2026-10-22)
                     operator: Gt
                     values: ["20000"]                           # features (7.3 GB) + activations must fit

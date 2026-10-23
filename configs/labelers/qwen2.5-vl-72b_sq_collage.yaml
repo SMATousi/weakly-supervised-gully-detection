@@ -2,7 +2,7 @@ name: qwen2.5-vl-72b_sq_collage
 model: Qwen/Qwen2.5-VL-72B-Instruct
 revision: null            # pin the HF commit sha before the full-pool run (record it in the JSONL)
 tp: 4
-max_model_len: 16384
+max_model_len: 8192
 dtype: bfloat16
 image_mode: collage       # multi_image | collage
 naip_size: 224            # NAIP 128 px upsampled (bicubic) to this

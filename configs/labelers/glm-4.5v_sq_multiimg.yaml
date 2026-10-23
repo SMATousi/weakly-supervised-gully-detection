@@ -2,7 +2,7 @@ name: glm-4.5v_sq_multiimg
 model: zai-org/GLM-4.5V
 revision: null            # pin the HF commit sha before the full-pool run (record it in the JSONL)
 tp: 4
-max_model_len: 16384
+max_model_len: 8192
 dtype: bfloat16
 image_mode: multi_image   # multi_image | collage
 naip_size: 224            # NAIP 128 px upsampled (bicubic) to this
