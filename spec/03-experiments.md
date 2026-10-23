@@ -99,3 +99,13 @@ What this does and does not show:
 - `sq_v1` (long system prompt describing gullies, JSON answer) made Qwen2.5-VL-7B (16 dev smoke locations) and Qwen3-VL-8B (137 labeled locations) answer **"yes" for every location**, with P(yes) >= 0.999. Accuracy equals the base rate (54% positive), so the labeler is useless and P(yes) cannot be thresholded. Mistral-Small-3.2-24B confirmed it (64/64 "yes", P(yes) >= 0.986), so the cause is the prompt, not one model; its job and the queued Qwen2.5-VL-72B job were cancelled.
 - Partial outputs are kept in `ali-vol-500g:gully/labels/degenerate_sq_v1/`. The 8B pool runs were cancelled to save GPU time.
 - Next: a prompt sweep (`--prompt-ids sq_v2 sq_v3 sq_v4`, one model load) on the 548 labeled locations, scored on dev only. Pick the prompt on dev, then run the pool. Prompt is a hyperparameter selected on dev, like the labeler list.
+
+### 8B prompt sweep on the labeled set, scored on dev (n=150) (2026-10-23, `scripts/screen_labelers.py`, `results/E3/screening_8b_prompts.json`)
+| Qwen3-VL-8B prompt | Predicts positive | Acc (own answer) | ROC-AUC of P(yes) | Acc at dev-best threshold |
+|---|---|---|---|---|
+| sq_v2 | 96% | 0.520 | 0.641 | 0.640 |
+| sq_v3 | 100% | 0.533 | 0.621 | 0.633 |
+| sq_v4 | 88% | 0.627 | 0.653 | 0.647 |
+- Still strongly biased to "yes" under all prompts; P(yes) is saturated (34-61 distinct values over 548 locations). An 8B model is a weak labeler here (ROC-AUC 0.62-0.65), well below Qwen2.5-VL-72B with the legacy collage prompt (acc 0.673).
+- Error correlation between the three prompts is high (0.75-0.92): prompt changes add little diversity. Legacy Llama-3.2-90B errors are uncorrelated with the 8B (-0.1 to -0.3), which is what weak supervision can use.
+- Next: bigger models. Qwen3-VL-32B-FP8 (35.5 GB) on 2 x 24 GB cards (`nvidia.com/gpu: 2`, easier to get than A100s); the A100 server has been pending for 6h43m. Also test `image_mode: collage` (E2).
