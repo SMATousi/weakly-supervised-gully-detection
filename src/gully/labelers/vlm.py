@@ -146,24 +146,27 @@ def _engine(cfg: dict):
     return llm, SamplingParams(temperature=0.0, max_tokens=48, logprobs=20, **constraint)
 
 
-def run_many(cfg: dict, prompt: dict, tasks: list[tuple[list[str], str | Path]], load_arrays,
-             chunk: int = 64) -> None:
-    """Load the model ONCE, then label every task = (loc_ids, out_path). Each output is resumable."""
+def run_many(cfg: dict, prompt: dict, tasks: list, load_arrays, chunk: int = 64) -> None:
+    """Load the model ONCE, then label every task. A task is (loc_ids, out_path) using the default prompt/cfg,
+    or (loc_ids, out_path, prompt, task_cfg) to override them (prompt sweeps share one model load).
+    Each output is resumable."""
     todo = []
-    for ids, out_path in tasks:
-        Path(out_path).parent.mkdir(parents=True, exist_ok=True)
+    for t in tasks:
+        ids, out_path = t[0], Path(t[1])
+        out_path.parent.mkdir(parents=True, exist_ok=True)
         done = done_ids(out_path)
-        todo.append(([i for i in ids if i not in done], Path(out_path)))
+        todo.append(([i for i in ids if i not in done], out_path, t[2] if len(t) > 2 else prompt,
+                     t[3] if len(t) > 3 else cfg))
     if not any(t[0] for t in todo):
         return
     llm, sp = _engine(cfg)
-    for ids_todo, out_path in todo:
+    for ids_todo, out_path, task_prompt, task_cfg in todo:
         with open(out_path, "a") as f:
             for s in range(0, len(ids_todo), chunk):
                 ids = ids_todo[s:s + chunk]
-                msgs = [build_messages(prep_images(load_arrays(i), cfg["naip_size"], cfg["highres_size"]),
-                                       prompt, cfg["image_mode"]) for i in ids]
-                if cfg.get("image_url_parts"):  # mistral-common rejects `image_pil`; it takes image_url data URLs
+                msgs = [build_messages(prep_images(load_arrays(i), task_cfg["naip_size"], task_cfg["highres_size"]),
+                                       task_prompt, task_cfg["image_mode"]) for i in ids]
+                if task_cfg.get("image_url_parts"):  # mistral-common rejects `image_pil`; it takes image_url data URLs
                     from gully.labelers.vlm_client import to_api_messages
 
                     msgs = [to_api_messages(m) for m in msgs]
@@ -174,7 +177,7 @@ def run_many(cfg: dict, prompt: dict, tasks: list[tuple[list[str], str | Path]],
                     c = o.outputs[0]
                     toks = [next(iter(lp.values())).decoded_token or "" for lp in c.logprobs]
                     tops = [{v.decoded_token or "": v.logprob for v in lp.values()} for lp in c.logprobs]
-                    f.write(json.dumps(make_record(i, cfg, c.text, p_yes_from_logprobs(c.text, toks, tops),
+                    f.write(json.dumps(make_record(i, task_cfg, c.text, p_yes_from_logprobs(c.text, toks, tops),
                                                    lat)) + "\n")
                 f.flush()
 

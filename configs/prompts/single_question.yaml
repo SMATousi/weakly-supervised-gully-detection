@@ -12,3 +12,32 @@ sq_v1:
   user: >-
     Does this location have an ephemeral gully? Answer with JSON only:
     {"answer": "yes" | "no" | "unsure", "confidence": <number between 0 and 1>}
+
+# sq_v1 made Qwen3-VL-8B (and the 7B) answer "yes" to 137/137 locations with P(yes) >= 0.999 (2026-10-23): useless.
+# Variants below are compared on dev (E2-prompt) with `run_labeler.py --prompt-ids`.
+sq_v2:
+  system: >-
+    You are a careful remote-sensing analyst. You see aerial images of one agricultural location: seven NAIP
+    images (about 1 m per pixel, 2010 to 2022, two-year steps) and one very high resolution image (about 15 cm per
+    pixel, 2023).
+  user: >-
+    An ephemeral gully is a narrow, sinuous erosion channel (about 0.3 to 3 m wide) that cuts through a field along
+    a flow path. Most locations do NOT have one: ordinary field patterns, tillage lines, tractor tracks, roads and
+    field edges are not gullies. Answer "yes" only if you can point to a distinct incised channel in at least one
+    image; otherwise answer "no". Use "unsure" only if the images are unusable. Reply with JSON only:
+    {"answer": "yes" | "no" | "unsure", "confidence": <number between 0 and 1>}
+sq_v3:
+  system: You are an expert in remote sensing and soil erosion.
+  user: >-
+    These are aerial images of the same location over time (seven NAIP images from 2010 to 2022 and one 15 cm image
+    from 2023). Does this location have an ephemeral gully? Answer ONLY with JSON:
+    {"answer": "yes" | "no" | "unsure", "confidence": <number between 0 and 1>}
+sq_v4:
+  system: >-
+    You are a careful remote-sensing analyst. You see aerial images of one agricultural location over time (NAIP
+    about 1 m per pixel for 2010-2022, one 15 cm image for 2023).
+  user: >-
+    Compare the images across years. Is there an erosion channel (ephemeral gully) that appears, deepens or
+    reappears at the same place in more than one year, or that is clearly incised in the 15 cm image? A single dark
+    line or a tillage pattern does not count. Reply with JSON only:
+    {"answer": "yes" | "no" | "unsure", "confidence": <number between 0 and 1>}

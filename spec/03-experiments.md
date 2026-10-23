@@ -94,3 +94,8 @@ What this does and does not show:
 - **Suggestive, to be tested with 5 seeds + bootstrap:** (a) Snorkel *soft* labels beat *hard* labels on accuracy (0.667 avg vs 0.607) and F1 for all three heads; (b) the temporal head has the best PR-AUC in all three soft/MV groups (0.752 / 0.745 / 0.731, vs 0.69-0.71) but not better accuracy at threshold 0.5, so the gain is in ranking and may need a dev-chosen threshold; (c) the linear head peaks within the first 5 epochs (overfits its ~200k-dim input).
 - B10 matters here: Snorkel on 3 binary LFs gives only 7 distinct soft labels, yet soft still helped. More informative (confidence-valued) LFs should widen this gap.
 - Next: 5 seeds, a dev-chosen threshold, and the same grid on the new labelers once they exist.
+
+### E3/E2-prompt: the first new prompt is degenerate (2026-10-23)
+- `sq_v1` (long system prompt describing gullies, JSON answer) made Qwen2.5-VL-7B (16 dev smoke locations) and Qwen3-VL-8B (137 labeled locations) answer **"yes" for every location**, with P(yes) >= 0.999. Accuracy equals the base rate (54% positive), so the labeler is useless and P(yes) cannot be thresholded. The same prompt is running on Mistral-Small-3.2-24B as a check.
+- Partial outputs are kept in `ali-vol-500g:gully/labels/degenerate_sq_v1/`. The 8B pool runs were cancelled to save GPU time.
+- Next: a prompt sweep (`--prompt-ids sq_v2 sq_v3 sq_v4`, one model load) on the 548 labeled locations, scored on dev only. Pick the prompt on dev, then run the pool. Prompt is a hyperparameter selected on dev, like the labeler list.

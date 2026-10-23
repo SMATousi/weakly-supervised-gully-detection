@@ -17,6 +17,7 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--config", required=True)
     ap.add_argument("--set", nargs="+", default=["dev"], choices=["dev", "test", "labeled", "pool", "all"])
+    ap.add_argument("--prompt-ids", nargs="+", help="prompt sweep: label with each of these prompts (one model load); outputs are named <labeler>__<prompt>")
     ap.add_argument("--server", help="e.g. http://gully-vlm:8000/v1")
     ap.add_argument("--concurrency", type=int, default=32)
     ap.add_argument("--index", default="artifacts/index/locations.parquet")
@@ -29,7 +30,8 @@ def main() -> None:
     with open(a.config) as f:
         cfg = yaml.safe_load(f)
     with open(cfg["prompt_file"]) as f:
-        prompt = yaml.safe_load(f)[cfg["prompt_id"]]
+        prompts = yaml.safe_load(f)
+    prompt = prompts[cfg["prompt_id"]]
     roots = dict(r.split("=", 1) for r in a.pvc_root)
     idx = pd.read_parquet(a.index).set_index("loc_id")
     i, n = map(int, a.shard.split("/"))
@@ -45,7 +47,14 @@ def main() -> None:
         d = Path(roots[r["pvc"]]) / r["img_dir"]
         return [read_rgb(d / r[f"img_naip_{k}"]) for k in range(7)] + [read_rgb(d / r["img_highres"])]
 
-    tasks = [(ids_for(name), Path(a.out) / f"{cfg['name']}.{name}{suffix}.jsonl") for name in a.set]
+    if a.prompt_ids:  # one task per (prompt, set); labeler name carries the prompt id
+        tasks = []
+        for pid in a.prompt_ids:
+            tcfg = {**cfg, "prompt_id": pid, "name": f"{cfg['name']}__{pid}"}
+            tasks += [(ids_for(name), Path(a.out) / f"{tcfg['name']}.{name}{suffix}.jsonl", prompts[pid], tcfg)
+                      for name in a.set]
+    else:
+        tasks = [(ids_for(name), Path(a.out) / f"{cfg['name']}.{name}{suffix}.jsonl") for name in a.set]
     if a.server:
         import asyncio
 
