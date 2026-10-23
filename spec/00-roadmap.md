@@ -46,7 +46,7 @@ Owner: **C** Claude, **H** human, **GPU** unattended job.
 - [ ] H+C: **Gate G1**: pipeline reproduces, leakage quantified, go/no-go on split design
 
 **D3-D4: labeler screening and launch**
-- [ ] GPU: prompt sweep on dev (`sq_v2..v4`; `sq_v1` was degenerate, always "yes"); then pick the prompt before any pool run
+- [x] GPU: prompt sweep on dev (`sq_v1` degenerate, always "yes"; Qwen3-VL-32B-FP8 with `sq_v4` chosen on dev: ROC-AUC 0.75, PR-AUC 0.80)
 - [ ] GPU: **E2** collage vs multi-image (Qwen2.5-VL-72B on dev)
 - [ ] GPU: **E3 dev screening** of 5-7 labelers on the 548 labeled locations, scored on dev only (running: Qwen3-VL-32B, Mistral-Small-3.2-24B, Qwen2.5-VL-72B; `scripts/screen_labelers.py` written; InternVL3-78B, GLM-4.5V still to submit)
 - [ ] C+H: select the labelers for the full pool

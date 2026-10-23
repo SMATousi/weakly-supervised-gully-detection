@@ -112,3 +112,10 @@ What this does and does not show:
 
 ### First useful new labeler: Qwen3-VL-32B-FP8, prompt sq_v2 (2026-10-23, dev n=150, `results/E3/screening_32b_v2.json`)
 Own answer: acc 0.660, F1 0.617, precision 0.774, recall 0.513 (predicts 35% positive vs 53% in dev GT). P(yes): ROC-AUC 0.739, PR-AUC 0.798, acc 0.680 at the dev-best threshold 0.269 (optimistic: tuned on dev). Ran on 2 x 24 GB cards (`nvidia.com/gpu: 2`, FP8 weights 35.5 GB, eager mode, 0.95 GPU memory; a harmless allocator OOM warning appears on the first batch). Error correlation with legacy Qwen2.5-VL-72B 0.01, legacy Llama mq 0.03, legacy Llama sq 0.38, Qwen3-VL-8B sq_v4 -0.15: a genuinely different error profile. sq_v4 on the same model is still running; pick the prompt on dev before any pool run.
+
+### Prompt choice for Qwen3-VL-32B-FP8 (dev n=150, `results/E3/screening_32b_prompts.json`)
+| Prompt | Predicts positive | Acc | F1 | ROC-AUC | PR-AUC |
+|---|---|---|---|---|---|
+| sq_v2 | 35% | 0.660 | 0.617 | 0.739 | 0.798 |
+| sq_v4 | 51% | 0.653 | 0.667 | 0.750 | 0.801 |
+Chosen on dev (PR-AUC, then F1): **sq_v4** (positive rate 51% vs 53% in dev GT; v2 under-predicts). Differences are within noise; error correlation v2/v4 is 0.66, so one prompt is enough. Pool run launched as 4 shards x 2 GPUs (`--prompt-ids sq_v4 --shard i/4`, ~1 location/s per job). Labeled-set outputs are named `<labeler>__sq_v4.labeled.jsonl`; pool shards use the same labeler name. Merge before building the label matrix.
