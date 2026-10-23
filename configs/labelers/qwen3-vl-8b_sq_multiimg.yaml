@@ -2,8 +2,10 @@ name: qwen3-vl-8b_sq_multiimg
 model: Qwen/Qwen3-VL-8B-Instruct
 revision: null            # pin the HF commit sha before the full-pool run (record it in the JSONL)
 tp: 1
-max_model_len: 8192
+max_model_len: 3072
 dtype: bfloat16
+gpu_mem_util: 0.95        # 24 GB cards: 16.6 GiB of weights leave little KV cache
+llm_kwargs: {enforce_eager: true}   # skip CUDA graphs to save memory; prompts are ~1.4k tokens so 3072 is enough
 image_mode: multi_image   # multi_image | collage
 naip_size: 224            # NAIP 128 px upsampled (bicubic) to this
 highres_size: 672         # 15 cm tile resized (Lanczos) to this
