@@ -43,7 +43,7 @@ spec:
             - {name: HF_HOME, value: /pvc/ali-vol-500g/gully/hf}
             - {name: VLLM_WORKER_MULTIPROC_METHOD, value: spawn}
           resources:
-            limits: {nvidia.com/gpu: __GPUS__, cpu: "__CPU__", memory: __MEM__Gi}
+            limits: {nvidia.com/__GPURES__: __GPUS__, cpu: "__CPU__", memory: __MEM__Gi}
             requests: {cpu: "__CPUREQ__", memory: __MEMREQ__Gi}
           volumeMounts:
             - {name: v500, mountPath: /pvc/ali-vol-500g}

@@ -6,6 +6,7 @@ Owner key: **C** = Claude (code, analysis, drafting), **H** = human only (data h
 
 ## Compute plan
 - **Nautilus, any GPU that fits** (user decision, updated 2026-10-22; originally A100 only). Big VLMs still need 80 GB A100s with tensor parallelism; small jobs (features, students) take whatever is free. A100 notes: Select with `nodeAffinity` on `nvidia.com/gpu.product`: `NVIDIA-A100-SXM4-80GB` (nodes with 4-8 GPUs: SDSC, Mizzou fiona, OSU, KSU, USD, UNL, ...) or `NVIDIA-A100-80GB-PCIe` (SDSU, Fullerton). About 140 full 80 GB A100s exist cluster-wide. Avoid `A100-PCIE-40GB` (mostly 1 GPU per node, so no tensor parallel) and the `MIG-1g.10gb` slices (SDSU).
+- **Request A100s as `nvidia.com/a100`** (A100 nodes expose that resource, not `nvidia.com/gpu`). Asking for `nvidia.com/gpu` plus a big-memory selector only matches a few reserved L40 nodes, so those jobs never schedule.
 - Namespace `gpn-mizzou-vigir` cannot use H100/H200/GH200 (quota 0); max 200 pods.
 - VLM labeling (vLLM): one pod per model with TP=2 or 4 on one 80 GB node, or several 1-GPU pods for models <=30B; shard the pool by index as an Indexed Job. Student runs on cached features fit one A100 (or any smaller GPU).
 - Free-GPU counts are not visible to us; expect queueing. Submit the long VLM jobs early and make them resumable.
