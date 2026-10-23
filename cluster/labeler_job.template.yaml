@@ -10,12 +10,16 @@ spec:
       restartPolicy: Never
       affinity:
         nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:   # soft: avoid nodes with broken GPUs, never forbid
+            - weight: 100
+              preference:
+                matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: NotIn
+                    values: [k8s-haosu-12.sdsc.optiputer.net, nautilus-ext-gpu01.fullerton.edu]
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
               - matchExpressions:
-                  - key: kubernetes.io/hostname
-                    operator: NotIn
-                    values: [k8s-haosu-12.sdsc.optiputer.net, nautilus-ext-gpu01.fullerton.edu]   # broken GPUs: reject pods at admission (2026-10-22/23)
                   - key: nvidia.com/gpu.memory
                     operator: Gt
                     values: ["__MINMEM__"]
