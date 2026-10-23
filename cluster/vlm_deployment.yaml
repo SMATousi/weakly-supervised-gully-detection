@@ -55,8 +55,8 @@ spec:
             httpGet: {path: /health, port: 8000}
             periodSeconds: 30
           resources:
-            limits: {nvidia.com/gpu: 2, cpu: "12", memory: 14Gi}
-            requests: {cpu: "12", memory: 14Gi}
+            limits: {nvidia.com/gpu: 2, cpu: "6", memory: 7Gi}
+            requests: {cpu: "6", memory: 7Gi}
           volumeMounts:
             - {name: v500, mountPath: /pvc/ali-vol-500g}
             - {name: shm, mountPath: /dev/shm}
