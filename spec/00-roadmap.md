@@ -81,8 +81,10 @@ Owner: **C** Claude, **H** human, **GPU** unattended job.
 
 - [x] C: E6 code ready and tested on synthetic data: `ws/label_models.py` (MV, Snorkel, Dawid-Skene, our triplet-method reimplementation), `ws/confidence_lfs.py` (dev-tuned abstain bands, soft logit aggregator; fixes B10). FlyingSquid itself is not used (needs an outdated pgmpy API); EBCC/MeTaL/NPLM/LELA not done (cut list 3)
 - [x] C: `scripts/run_e6.py` (binary vs confidence-valued, dev-only scoring, dev class prior) and `scripts/merge_labels.py` ready; smoke-tested on the legacy labelers
-- [ ] GPU: Qwen3-VL-32B-FP8 `sq_v4` pool run (4 shards x 2 GPUs, running as of 15:00)
-- [ ] D8-D9 C: merge shards, run **E6** on {legacy 3 + Qwen3-VL-32B} (binary vs confidence-valued LFs)
+- [x] GPU: Qwen3-VL-32B-FP8 `sq_v4` pool run (18,179 pool + 548 labeled, merged)
+- [ ] GPU: more strong, diverse labelers (Mistral-Small-3.2-24B, Qwen2.5-VL-72B-AWQ, Qwen3-VL-30B-A3B-FP8) with the `sq_v4` prompt; dev screening first
+- [x] C: merged shards; **E6** on {legacy 3 + Qwen3-VL-32B}: PR-AUC 0.69-0.71 -> 0.75-0.79 on dev (`03-experiments.md`)
+- [x] C: **E7/E11** first full grid on the new pseudo-labels (7 label sets x 2 heads x 3 seeds): single-labeler distillation (32B) beats every WS aggregate on dev; temporal head best on PR-AUC. Does not yet support the WS claim
 - [ ] D9-D10 C: **E7** WS vs distillation; **E11** heads with the final LF set; 5 seeds each
 - [ ] D10-D11 C: **E10** ablations (backbone, resolution, dates); **E12** Reece-supervised + supervised CV upper bound
 - [ ] D11-D12 C: **E8** #LF curve; **E9** data scaling

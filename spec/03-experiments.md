@@ -139,3 +139,26 @@ LFs: legacy Llama-90B multi-question, legacy Llama-90B single, legacy Qwen2.5-VL
 - Adding the 32B labeler raises PR-AUC from 0.69-0.71 to 0.75-0.79; the confidence-valued (abstain-band) variants are best on PR-AUC. Accuracy changes are within noise (one SE ~ 0.04 at n=150).
 - Posteriors are far richer (17-23 distinct vs 7; B10), the soft-logit aggregator has 101, but it uses dev labels as supervision, so treat it as a supervised stacker, not weak supervision.
 - **Pool prevalence is model-dependent (33-55% predicted positive)**, and the new labeler alone calls 31.5% of the pool positive vs 48% on the labeled set: prior shift (B11). The D-4 annotation is the only way to know.
+
+### E7 / E11 on the new pseudo-labels (2026-10-23, `scripts/run_grid.py`, `results/E7_new_labelers/`; dev n=150, mean +- std over 3 seeds, threshold 0.5, epoch chosen on dev PR-AUC)
+Same FlexiViT-S frozen features and training setup as the early grid. LFs: 3 legacy labelers + Qwen3-VL-32B-FP8 `sq_v4`.
+
+| Training labels | Head | Acc | F1 | ROC-AUC | PR-AUC |
+|---|---|---|---|---|---|
+| 32B alone, hard | temporal | 0.669 +- 0.017 | 0.631 +- 0.024 | 0.766 | **0.787 +- 0.005** |
+| 32B alone, soft P(yes) | temporal | 0.662 +- 0.014 | 0.641 +- 0.041 | 0.752 | 0.782 +- 0.021 |
+| Snorkel + 32B band (WS) | temporal | 0.638 +- 0.039 | 0.711 +- 0.049 | 0.717 | 0.754 +- 0.039 |
+| Dawid-Skene + 32B band (WS) | temporal | 0.627 +- 0.027 | 0.701 +- 0.033 | 0.671 | 0.715 +- 0.043 |
+| Majority vote, hard | temporal | 0.631 +- 0.027 | 0.679 +- 0.035 | 0.683 | 0.716 +- 0.026 |
+| Snorkel (WS) | temporal | 0.629 +- 0.034 | 0.656 +- 0.097 | 0.702 | 0.715 +- 0.018 |
+| Dawid-Skene (WS) | temporal | 0.593 +- 0.041 | 0.686 +- 0.016 | 0.686 | 0.705 +- 0.008 |
+| 32B alone, hard | MLP | 0.671 +- 0.023 | 0.706 +- 0.036 | 0.737 | 0.719 +- 0.040 |
+| Dawid-Skene + band | MLP | 0.664 +- 0.027 | 0.738 +- 0.023 | 0.660 | 0.659 +- 0.023 |
+| Snorkel + band | MLP | 0.644 +- 0.010 | 0.704 +- 0.013 | 0.692 | 0.700 +- 0.028 |
+(Mean over all label sets by head: MLP acc 0.649 / PR-AUC 0.690; temporal acc 0.636 / PR-AUC 0.739.)
+
+Reading (dev only; not for the paper until the final test evaluation):
+- **Plain distillation of the single best labeler (32B) gives the best students (PR-AUC ~0.78-0.79), better than every label-model aggregate (0.70-0.75), even though the label models score PR-AUC 0.75-0.79 themselves on dev.** This does NOT support the paper's claim that weak supervision beats distillation. Gaps are partly within noise (n=150, 3 seeds), but the direction is the same in every comparison.
+- The temporal head wins on ranking (PR-AUC) over the MLP in 6/7 label sets, not on accuracy at 0.5.
+- Hypotheses to test (E6/E7 follow-ups): (a) the legacy LFs are weak and distribution-shifted between pool and labeled set (legacy Llama-90B single: 2% positive on pool, 37% on labeled), so they inject noise into the label model; (b) the dev class prior (0.47) does not match the pool; (c) only one strong labeler exists, WS needs several good, diverse ones; (d) a dev-chosen threshold may matter more than the epoch. Next labelers: Mistral-Small-3.2-24B / Qwen2.5-VL-72B-AWQ with the `sq_v4` prompt, Qwen3-VL-30B-A3B-FP8.
+- Fallback framing from the roadmap applies if WS keeps failing to beat distillation: dataset + benchmark + WS study with honest negative results, temporal head as the method contribution.
