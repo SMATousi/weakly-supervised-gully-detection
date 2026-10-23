@@ -3,7 +3,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: gully-train-grid
+  name: __JOB__
 spec:
   backoffLimit: 6
   template:
@@ -31,8 +31,7 @@ spec:
               pip install -q pandas pyarrow scipy scikit-learn pyyaml
               pip install -q -e . --no-deps
               python scripts/run_grid.py --features /pvc/ali-vol-500g/gully/features/flexivit_s \
-                --pseudo snorkel_legacy3 snorkel_legacy3:hard mv_legacy3:hard mv_qwen72 \
-                --heads linear mlp temporal --seeds 0 --exp E_early_legacy \
+                --pseudo __PSEUDO__ --heads __HEADS__ --seeds __SEEDS__ --exp __EXP__ \
                 --out /pvc/ali-vol-500g/gully/results --ckpt-dir /pvc/ali-vol-500g/gully/students
           resources:
             limits: {nvidia.com/gpu: 1, cpu: "4", memory: 4800Mi}
