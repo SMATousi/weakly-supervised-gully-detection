@@ -8,7 +8,7 @@ spec:
   containers:
     - name: shell
       image: python:3.11-slim
-      command: ["bash", "-c", "sleep 7200"]
+      command: ["bash", "-c", "sleep 21600"]
       resources:
         limits: {cpu: "2", memory: 4Gi}
         requests: {cpu: "2", memory: 4Gi}
