@@ -1,0 +1,14 @@
+name: qwen3-vl-30b-a3b-fp8_sq_multiimg
+model: Qwen/Qwen3-VL-30B-A3B-Instruct-FP8      # MoE, ~31 GB FP8, 3B active parameters
+revision: null            # pin the HF commit sha before the full-pool run
+tp: 2
+max_model_len: 3072       # prompts are ~1.4k tokens
+gpu_mem_util: 0.92
+llm_kwargs: {enforce_eager: true}
+dtype: auto
+image_mode: multi_image
+naip_size: 224
+highres_size: 672
+prompt_file: configs/prompts/single_question.yaml
+prompt_id: sq_v4
+seed: 0

@@ -162,3 +162,13 @@ Reading (dev only; not for the paper until the final test evaluation):
 - The temporal head wins on ranking (PR-AUC) over the MLP in 6/7 label sets, not on accuracy at 0.5.
 - Hypotheses to test (E6/E7 follow-ups): (a) the legacy LFs are weak and distribution-shifted between pool and labeled set (legacy Llama-90B single: 2% positive on pool, 37% on labeled), so they inject noise into the label model; (b) the dev class prior (0.47) does not match the pool; (c) only one strong labeler exists, WS needs several good, diverse ones; (d) a dev-chosen threshold may matter more than the epoch. Next labelers: Mistral-Small-3.2-24B / Qwen2.5-VL-72B-AWQ with the `sq_v4` prompt, Qwen3-VL-30B-A3B-FP8.
 - Fallback framing from the roadmap applies if WS keeps failing to beat distillation: dataset + benchmark + WS study with honest negative results, temporal head as the method contribution.
+
+### E6 ablation: do the weak legacy labelers hurt the label model? (2026-10-23, `results/E6_ablation/`, dev n=150)
+All 3-labeler subsets that contain the new 32B labeler (Q) vs all 4 (Q + L1 legacy Llama mq + L2 legacy Llama sq + L3 legacy Qwen-72B sq). Best PR-AUC per subset (Snorkel/DS with the 32B P(yes) band):
+| Subset | Binary DS/Snorkel PR-AUC | Band DS / Snorkel PR-AUC |
+|---|---|---|
+| Q + L3 + L2 | 0.745 / 0.746 | 0.781 / 0.787 |
+| Q + L3 + L1 | 0.692 / 0.692 | 0.788 / 0.787 |
+| Q + L2 + L1 | 0.731 / 0.735 | 0.742 / 0.755 |
+| all 4 | 0.765 / 0.765 | 0.789 / 0.791 |
+Removing legacy labelers does not help; all 4 is as good or better. So the legacy labelers are not what limits WS. The 32B's own P(yes) already scores PR-AUC 0.801 / ROC-AUC 0.750 on dev, slightly above every aggregate (0.791 max): with these labelers the label model adds nothing over the best single labeler. WS needs more strong, different labelers: screening Qwen3-VL-30B-A3B-FP8 (`sq_v2`, `sq_v4`) next.
