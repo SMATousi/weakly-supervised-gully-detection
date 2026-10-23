@@ -179,3 +179,14 @@ Removing legacy labelers does not help; all 4 is as good or better. So the legac
 | sq_v2 | 93% | 0.527 | 0.656 | 0.711 | 0.667 |
 | sq_v4 | 100% | 0.533 | 0.661 | 0.694 | 0.633 |
 Yes-biased under both prompts and poor at ranking (ROC-AUC ~0.66, like the 8B), far below the dense Qwen3-VL-32B-FP8 `sq_v4` (ROC-AUC 0.750, PR-AUC 0.801). Error correlation between its two prompts is 0.85. **Not run on the pool.** Its errors are only weakly correlated with the 32B (0.12 / -0.01), but a weak labeler adds noise, not signal. Observed so far: among the open models tried (Qwen2.5-VL-7B, Qwen3-VL-8B, Qwen3-VL-30B-A3B, Qwen3-VL-32B), only the dense 32B is a good labeler here; small or low-active-parameter models say "yes" to almost everything. Next candidates must be dense and large: Qwen2.5-VL-72B (AWQ, 4 GPUs), InternVL3-78B, Mistral-Small-3.2-24B (1 x 80 GB or FP8); plus a second variant of the 32B (collage image mode, E2; a different prompt) for some diversity.
+
+### E2: image presentation for Qwen3-VL-32B-FP8 (2026-10-23, `results/E3/screening_32b_collage.json`; dev n=150)
+| Presentation, prompt | Predicts pos. | Acc | F1 | ROC-AUC | PR-AUC | Acc at dev-best thr. |
+|---|---|---|---|---|---|---|
+| **Collage (4x2 grid with year labels, 1200x600), sq_v4** | 33% | **0.713** | 0.667 | 0.786 | **0.815** | **0.747** |
+| Collage, sq_v2 | 29% | 0.707 | 0.645 | 0.795 | 0.813 | 0.747 |
+| Multi-image (8 images, NAIP 224 px, high-res 672 px), sq_v4 | 51% | 0.653 | 0.667 | 0.750 | 0.801 | 0.707 |
+| Multi-image, sq_v2 | 35% | 0.660 | 0.617 | 0.739 | 0.798 | 0.680 |
+- **Collage beats multi-image by ~6 points of accuracy and ~0.04 ROC-AUC on both prompts.** The legacy collage presentation was not a flaw for this model: the one-image grid with year labels works better than 8 separate images (precision 0.88-0.91, recall ~0.5: conservative). This is a finding for the paper (E2) and corrects my prior assumption that multi-image would win.
+- Error correlation collage vs multi-image (sq_v4): 0.47; collage vs legacy Qwen-72B: -0.06. Two views of the same model are moderately different voters.
+- Chosen on dev: **collage + sq_v4**. Pool run launched (4 shards x 2 GPUs). Both views of the 32B can then be labeling functions.

@@ -1,0 +1,112 @@
+{
+  "labelers": {
+    "qwen3-vl-32b-fp8_sq_collage__sq_v2": {
+      "file": "qwen3-vl-32b-fp8_sq_collage__sq_v2.labeled.jsonl",
+      "n_dev": 150,
+      "coverage": 1.0,
+      "pos_rate": 0.29333333333333333,
+      "acc_covered": 0.7066666666666667,
+      "acc": 0.7066666666666667,
+      "f1": 0.6451612903225806,
+      "precision": 0.9090909090909091,
+      "recall": 0.5,
+      "pr_auc": 0.8125358819489522,
+      "roc_auc": 0.7948214285714286,
+      "dev_best_thr": 0.075858183573243,
+      "acc_at_dev_best_thr": 0.7466666666666667
+    },
+    "qwen3-vl-32b-fp8_sq_collage__sq_v4": {
+      "file": "qwen3-vl-32b-fp8_sq_collage__sq_v4.labeled.jsonl",
+      "n_dev": 150,
+      "coverage": 1.0,
+      "pos_rate": 0.32666666666666666,
+      "acc_covered": 0.7133333333333334,
+      "acc": 0.7133333333333334,
+      "f1": 0.6666666666666666,
+      "precision": 0.8775510204081632,
+      "recall": 0.5375,
+      "pr_auc": 0.8152872133777834,
+      "roc_auc": 0.7858928571428572,
+      "dev_best_thr": 0.18242553785347201,
+      "acc_at_dev_best_thr": 0.7466666666666667
+    },
+    "qwen3-vl-32b-fp8_sq_multiimg__sq_v2": {
+      "file": "qwen3-vl-32b-fp8_sq_multiimg__sq_v2.labeled.jsonl",
+      "n_dev": 150,
+      "coverage": 1.0,
+      "pos_rate": 0.35333333333333333,
+      "acc_covered": 0.66,
+      "acc": 0.66,
+      "f1": 0.6165413533834586,
+      "precision": 0.7735849056603774,
+      "recall": 0.5125,
+      "pr_auc": 0.7980249618847691,
+      "roc_auc": 0.7389285714285715,
+      "dev_best_thr": 0.268941445385807,
+      "acc_at_dev_best_thr": 0.68
+    },
+    "qwen3-vl-32b-fp8_sq_multiimg__sq_v4": {
+      "file": "qwen3-vl-32b-fp8_sq_multiimg__sq_v4.labeled.jsonl",
+      "n_dev": 150,
+      "coverage": 1.0,
+      "pos_rate": 0.5066666666666667,
+      "acc_covered": 0.6533333333333333,
+      "acc": 0.6533333333333333,
+      "f1": 0.6666666666666667,
+      "precision": 0.6842105263157895,
+      "recall": 0.65,
+      "pr_auc": 0.8009559205447168,
+      "roc_auc": 0.7498214285714285,
+      "dev_best_thr": 0.9975273764647061,
+      "acc_at_dev_best_thr": 0.7066666666666667
+    },
+    "legacy_qwen2.5-vl-72b_sq": {
+      "file": "legacy_qwen2.5-vl-72b_sq.jsonl",
+      "n_dev": 150,
+      "coverage": 1.0,
+      "pos_rate": 0.7,
+      "acc_covered": 0.6733333333333333,
+      "acc": 0.6733333333333333,
+      "f1": 0.7351351351351351,
+      "precision": 0.6476190476190476,
+      "recall": 0.85
+    }
+  },
+  "error_corr": {
+    "qwen3-vl-32b-fp8_sq_collage__sq_v2": {
+      "qwen3-vl-32b-fp8_sq_collage__sq_v2": 1.0,
+      "qwen3-vl-32b-fp8_sq_collage__sq_v4": 0.79,
+      "qwen3-vl-32b-fp8_sq_multiimg__sq_v2": 0.65,
+      "qwen3-vl-32b-fp8_sq_multiimg__sq_v4": 0.45,
+      "legacy_qwen2.5-vl-72b_sq": -0.07
+    },
+    "qwen3-vl-32b-fp8_sq_collage__sq_v4": {
+      "qwen3-vl-32b-fp8_sq_collage__sq_v2": 0.79,
+      "qwen3-vl-32b-fp8_sq_collage__sq_v4": 1.0,
+      "qwen3-vl-32b-fp8_sq_multiimg__sq_v2": 0.67,
+      "qwen3-vl-32b-fp8_sq_multiimg__sq_v4": 0.47,
+      "legacy_qwen2.5-vl-72b_sq": -0.06
+    },
+    "qwen3-vl-32b-fp8_sq_multiimg__sq_v2": {
+      "qwen3-vl-32b-fp8_sq_collage__sq_v2": 0.65,
+      "qwen3-vl-32b-fp8_sq_collage__sq_v4": 0.67,
+      "qwen3-vl-32b-fp8_sq_multiimg__sq_v2": 1.0,
+      "qwen3-vl-32b-fp8_sq_multiimg__sq_v4": 0.66,
+      "legacy_qwen2.5-vl-72b_sq": 0.01
+    },
+    "qwen3-vl-32b-fp8_sq_multiimg__sq_v4": {
+      "qwen3-vl-32b-fp8_sq_collage__sq_v2": 0.45,
+      "qwen3-vl-32b-fp8_sq_collage__sq_v4": 0.47,
+      "qwen3-vl-32b-fp8_sq_multiimg__sq_v2": 0.66,
+      "qwen3-vl-32b-fp8_sq_multiimg__sq_v4": 1.0,
+      "legacy_qwen2.5-vl-72b_sq": 0.18
+    },
+    "legacy_qwen2.5-vl-72b_sq": {
+      "qwen3-vl-32b-fp8_sq_collage__sq_v2": -0.07,
+      "qwen3-vl-32b-fp8_sq_collage__sq_v4": -0.06,
+      "qwen3-vl-32b-fp8_sq_multiimg__sq_v2": 0.01,
+      "qwen3-vl-32b-fp8_sq_multiimg__sq_v4": 0.18,
+      "legacy_qwen2.5-vl-72b_sq": 1.0
+    }
+  }
+}
