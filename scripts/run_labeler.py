@@ -24,6 +24,8 @@ def main() -> None:
     ap.add_argument("--pvc-root", action="append", required=True)
     ap.add_argument("--out", default="artifacts/labels")
     ap.add_argument("--shard", default="0/1", help="i/n: process every n-th location starting at i")
+    ap.add_argument("--skip-first", type=int, default=0, help="after sharding, skip the first K locations (another job covers them)")
+    ap.add_argument("--slice", default="0/1", help="k/m: the k-th of m contiguous slices of the remaining locations")
     ap.add_argument("--limit", type=int)
     a = ap.parse_args()
 
@@ -35,12 +37,15 @@ def main() -> None:
     roots = dict(r.split("=", 1) for r in a.pvc_root)
     idx = pd.read_parquet(a.index).set_index("loc_id")
     i, n = map(int, a.shard.split("/"))
-    suffix = "" if n == 1 else f".shard{i}of{n}"
+    suffix = ("" if n == 1 else f".shard{i}of{n}") + ("" if a.slice == "0/1" else f".slice{a.slice.replace('/', 'of')}")
 
     def ids_for(name: str) -> list[str]:
         sel = {"dev": idx.split == "dev", "test": idx.split == "test", "labeled": idx.index.str[0] == "L",
                "pool": idx.index.str[0] == "U", "all": idx.split.notna()}[name]
-        return list(idx.index[sel])[i::n][: a.limit]
+        ids = list(idx.index[sel])[i::n][a.skip_first:]
+        k, m = map(int, a.slice.split("/"))
+        size = -(-len(ids) // m)  # contiguous slice k of m
+        return ids[k * size:(k + 1) * size][: a.limit]
 
     def load_arrays(loc_id: str):
         r = idx.loc[loc_id]
