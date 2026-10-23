@@ -38,7 +38,7 @@ Owner: **C** Claude, **H** human, **GPU** unattended job.
 
 **D2-D3: labeler runner and E0**
 - [x] C: `labelers/vlm.py` (multi-image + collage, JSON output, P(yes), resumable JSONL); helpers unit-tested
-- [ ] C: run `vlm.py` on vLLM for real; measure throughput on 50 locations (needs a GPU job)
+- [x] C: run `vlm.py` on vLLM for real: smoke test passed (Qwen2.5-VL-7B, 16 dev locations, JSON + P(yes) work; 0.49 s/location on an A10). Model loading from the PVC is slow (~35 MB/s)
 - [ ] C: pin Hugging Face revisions in `configs/labelers/*.yaml`
 - [x] C: **E0, label-model step**: old pseudo-labels reproduced 100%; B4 leak barely matters; Snorkel = best single LF on dev
 - [ ] C: **E0, student step**: legacy-equivalent student vs fixed (B1/B2/B5/B7) on cached features
@@ -46,7 +46,7 @@ Owner: **C** Claude, **H** human, **GPU** unattended job.
 
 **D3-D4: labeler screening and launch**
 - [ ] GPU: **E2** collage vs multi-image (Qwen2.5-VL-72B on dev)
-- [ ] GPU: **E3 dev screening** of 5-7 labelers (+ pairwise error correlation)
+- [ ] GPU: **E3 dev screening** of 5-7 labelers on the 548 labeled locations, scored on dev only (running: Qwen3-VL-32B, Mistral-Small-3.2-24B, Qwen2.5-VL-72B; `scripts/screen_labelers.py` written; InternVL3-78B, GLM-4.5V still to submit)
 - [ ] C+H: select the labelers for the full pool
 - [ ] GPU: launch the pool + labeled-set runs back-to-back (queue running)
 

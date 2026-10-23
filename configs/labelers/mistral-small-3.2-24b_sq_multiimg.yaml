@@ -10,3 +10,4 @@ highres_size: 672         # 15 cm tile resized (Lanczos) to this
 prompt_file: configs/prompts/single_question.yaml
 prompt_id: sq_v1
 seed: 0
+llm_kwargs: {tokenizer_mode: mistral, config_format: mistral, load_format: mistral}   # vLLM-recommended path for Mistral
