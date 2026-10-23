@@ -119,3 +119,23 @@ Own answer: acc 0.660, F1 0.617, precision 0.774, recall 0.513 (predicts 35% pos
 | sq_v2 | 35% | 0.660 | 0.617 | 0.739 | 0.798 |
 | sq_v4 | 51% | 0.653 | 0.667 | 0.750 | 0.801 |
 Chosen on dev (PR-AUC, then F1): **sq_v4** (positive rate 51% vs 53% in dev GT; v2 under-predicts). Differences are within noise; error correlation v2/v4 is 0.66, so one prompt is enough. Pool run launched as 4 shards x 2 GPUs (`--prompt-ids sq_v4 --shard i/4`, ~1 location/s per job). Labeled-set outputs are named `<labeler>__sq_v4.labeled.jsonl`; pool shards use the same labeler name. Merge before building the label matrix.
+
+### E6 on the combined labelers (2026-10-23, `scripts/run_e6.py`, `results/E6/e6_legacy3_q32.json`; dev n=150, dev class prior 0.47/0.53)
+LFs: legacy Llama-90B multi-question, legacy Llama-90B single, legacy Qwen2.5-VL-72B single, new Qwen3-VL-32B-FP8 `sq_v4` (pool 18,179 + labeled 548, merged and count-checked).
+
+| Label model | Acc | F1 | PR-AUC | Pool pos. rate | Distinct pool posteriors |
+|---|---|---|---|---|---|
+| MV (binary LFs) | 0.680 | 0.742 | 0.748 | 0.429 | 6 |
+| Dawid-Skene (binary) | 0.687 | 0.764 | 0.765 | 0.546 | 17 |
+| Triplet (binary) | 0.680 | 0.733 | 0.746 | 0.428 | 13 |
+| Snorkel (binary) | 0.680 | 0.747 | 0.765 | 0.429 | 17 |
+| MV, 32B as abstain band | 0.673 | 0.732 | 0.730 | 0.365 | 7 |
+| Dawid-Skene, band | 0.687 | 0.759 | 0.789 | 0.533 | 23 |
+| Triplet, band | 0.693 | 0.755 | 0.768 | 0.422 | 20 |
+| Snorkel, band | 0.660 | 0.730 | **0.791** | 0.471 | 21 |
+| Soft-logit aggregator (weights fit on dev, 5-fold CV on dev) | 0.640 | 0.667 | 0.749 | 0.334 | 101 |
+
+(Old 3 labelers only: MV 0.667/0.719/0.690, Snorkel 0.673/0.726/0.710.) Band for the 32B labeler tuned on dev: abstain for P(yes) in (0.008, 0.995), covered-accuracy 0.82 at >= 50% coverage.
+- Adding the 32B labeler raises PR-AUC from 0.69-0.71 to 0.75-0.79; the confidence-valued (abstain-band) variants are best on PR-AUC. Accuracy changes are within noise (one SE ~ 0.04 at n=150).
+- Posteriors are far richer (17-23 distinct vs 7; B10), the soft-logit aggregator has 101, but it uses dev labels as supervision, so treat it as a supervised stacker, not weak supervision.
+- **Pool prevalence is model-dependent (33-55% predicted positive)**, and the new labeler alone calls 31.5% of the pool positive vs 48% on the labeled set: prior shift (B11). The D-4 annotation is the only way to know.
