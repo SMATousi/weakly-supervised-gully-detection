@@ -80,7 +80,9 @@ Owner: **C** Claude, **H** human, **GPU** unattended job.
 ## Week 2: the experiment matrix (D8-D15)
 
 - [x] C: E6 code ready and tested on synthetic data: `ws/label_models.py` (MV, Snorkel, Dawid-Skene, our triplet-method reimplementation), `ws/confidence_lfs.py` (dev-tuned abstain bands, soft logit aggregator; fixes B10). FlyingSquid itself is not used (needs an outdated pgmpy API); EBCC/MeTaL/NPLM/LELA not done (cut list 3)
-- [ ] D8-D9 GPU/C: pool runs finish; build L; **E6** run the label models on the real label matrix (binary vs confidence-valued LFs)
+- [x] C: `scripts/run_e6.py` (binary vs confidence-valued, dev-only scoring, dev class prior) and `scripts/merge_labels.py` ready; smoke-tested on the legacy labelers
+- [ ] GPU: Qwen3-VL-32B-FP8 `sq_v4` pool run (4 shards x 2 GPUs, running as of 15:00)
+- [ ] D8-D9 C: merge shards, run **E6** on {legacy 3 + Qwen3-VL-32B} (binary vs confidence-valued LFs)
 - [ ] D9-D10 C: **E7** WS vs distillation; **E11** heads with the final LF set; 5 seeds each
 - [ ] D10-D11 C: **E10** ablations (backbone, resolution, dates); **E12** Reece-supervised + supervised CV upper bound
 - [ ] D11-D12 C: **E8** #LF curve; **E9** data scaling
