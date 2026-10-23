@@ -16,7 +16,7 @@ spec:
                 matchExpressions:
                   - key: kubernetes.io/hostname
                     operator: NotIn
-                    values: [k8s-haosu-12.sdsc.optiputer.net, nautilus-ext-gpu01.fullerton.edu]
+                    values: [k8s-haosu-12.sdsc.optiputer.net, nautilus-ext-gpu01.fullerton.edu, k8s-chase-ci-01.calit2.optiputer.net]
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
               - matchExpressions:
