@@ -22,7 +22,7 @@ dependencies = [
 # Heavy / GPU dependencies are extras so the base install (index, GT, metrics, tests) stays light.
 vlm = ["vllm", "transformers"]
 student = ["torch", "timm"]
-ws = ["snorkel", "flyingsquid"]
+ws = ["snorkel"]
 wandb = ["wandb"]
 dev = ["pytest", "ruff"]
 client = ["openai"]

@@ -23,7 +23,7 @@ Priority **P0** = without it the paper is not defensible; **P1** = expected by C
 | E3 | P0 | New open labelers (dev screening, then full pool) | 5–7 candidates on dev (see below); keep the ones that are accurate or add *different errors*; run the kept ones on pool + test | Table 1 (labelers), Fig. LF-correlation |
 | E4 | P1 | Cheap non-chat labelers | RemoteCLIP / GeoRSCLIP zero-shot, prompt ensemble, max over dates, abstain band tuned on dev | Table 1 |
 | E5 | P2 | Terrain labeler | DEM flow accumulation / TWI within field → rule with abstain | Table 1 |
-| E6 | P0 | Label models with the new LF set | MV, Dawid–Skene, Snorkel, FlyingSquid, EBCC, MeTaL, (NPLM, LELA if they port quickly); binary vs confidence-valued LFs | Table WS-frameworks |
+| E6 | P0 | Label models with the new LF set | MV, Dawid–Skene, Snorkel, triplet method (own reimplementation of the FlyingSquid estimator; the package does not install), (EBCC, MeTaL, NPLM, LELA only if time allows); binary vs confidence-valued LFs | Table WS-frameworks |
 | E7 | P0 | **Is weak supervision better than plain distillation?** | Student trained on: best single labeler (hard), MV (hard), Snorkel (hard), Snorkel (soft) | Main table |
 | E8 | P1 | # labelers curve | Snorkel + student with LF subsets of size 2…k (random orders, mean ± std) | Figure |
 | E9 | P1 | Unlabeled-data scaling | student on 1k / 2.5k / 5k / 10k / all pool | Figure |

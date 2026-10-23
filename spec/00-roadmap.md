@@ -58,7 +58,7 @@ Owner: **C** Claude, **H** human, **GPU** unattended job.
 
 **D4-D6: cheap labelers**
 - [ ] C: **E4** CLIP / RemoteCLIP / GeoRSCLIP labelers
-- [ ] C: **E5** terrain labeler from the DEM tiles (P2)
+- [ ] C: **E5** terrain labeler from the DEM tiles (P2). Blocked: DEM exists for the 18,179 pool locations only, none for the 548 labeled ones, so it cannot be validated on dev. Cut unless DEM for the labeled tiles can be obtained
 
 **D5-D7: student**
 - [x] C: `student/heads.py` (linear, mean-pool MLP, temporal attention) and `train.py` (dev-based selection), toy-tested
@@ -76,7 +76,8 @@ Owner: **C** Claude, **H** human, **GPU** unattended job.
 
 ## Week 2: the experiment matrix (D8-D15)
 
-- [ ] D8-D9 GPU/C: pool runs finish; build L; **E6** label models (binary vs confidence-valued LFs)
+- [x] C: E6 code ready and tested on synthetic data: `ws/label_models.py` (MV, Snorkel, Dawid-Skene, our triplet-method reimplementation), `ws/confidence_lfs.py` (dev-tuned abstain bands, soft logit aggregator; fixes B10). FlyingSquid itself is not used (needs an outdated pgmpy API); EBCC/MeTaL/NPLM/LELA not done (cut list 3)
+- [ ] D8-D9 GPU/C: pool runs finish; build L; **E6** run the label models on the real label matrix (binary vs confidence-valued LFs)
 - [ ] D9-D10 C: **E7** WS vs distillation; **E11** heads with the final LF set; 5 seeds each
 - [ ] D10-D11 C: **E10** ablations (backbone, resolution, dates); **E12** Reece-supervised + supervised CV upper bound
 - [ ] D11-D12 C: **E8** #LF curve; **E9** data scaling
