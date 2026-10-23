@@ -13,28 +13,13 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-import rasterio
 import torch
 import torch.nn.functional as F
 from torch.utils.data import DataLoader, Dataset
 
+from gully.data.images import decode_rgb, read_bytes, read_rgb  # noqa: F401  (read_rgb re-exported)
+
 ROLES = [f"naip_{i}" for i in range(7)] + ["highres"]
-
-
-def decode_rgb(data: bytes) -> np.ndarray:
-    """uint8 (H, W, 3) from GeoTIFF bytes; alpha band dropped (high-res tiles are RGBA)."""
-    with rasterio.io.MemoryFile(data) as mf, mf.open() as src:
-        arr = src.read([1, 2, 3])
-    return np.moveaxis(arr, 0, -1)
-
-
-def read_bytes(path: str | Path) -> bytes:
-    with open(path, "rb") as f:
-        return f.read()
-
-
-def read_rgb(path: str | Path) -> np.ndarray:
-    return decode_rgb(read_bytes(path))
 
 
 class LocationImages(Dataset):

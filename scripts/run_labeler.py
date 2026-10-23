@@ -9,8 +9,8 @@ from pathlib import Path
 import pandas as pd
 import yaml
 
+from gully.data.images import read_rgb
 from gully.labelers import vlm
-from gully.student.features import read_rgb
 
 
 def main() -> None:

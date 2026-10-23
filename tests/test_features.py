@@ -3,7 +3,8 @@ import pandas as pd
 import rasterio
 from rasterio.transform import from_origin
 
-from gully.student.features import LocationImages, read_rgb
+from gully.data.images import read_rgb
+from gully.student.features import LocationImages
 
 
 def _tif(path, size, bands):

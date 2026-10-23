@@ -58,8 +58,8 @@ spec:
             httpGet: {path: /health, port: 8000}
             periodSeconds: 30
           resources:
-            limits: {nvidia.com/a100: 2, cpu: "6", memory: 7Gi}   # A100 nodes expose nvidia.com/a100, not nvidia.com/gpu
-            requests: {cpu: "6", memory: 7Gi}
+            limits: {nvidia.com/a100: 2, cpu: "12", memory: 14Gi}   # A100 nodes expose nvidia.com/a100, not nvidia.com/gpu; 7Gi was OOM-killed after startup
+            requests: {cpu: "12", memory: 14Gi}
           volumeMounts:
             - {name: v500, mountPath: /pvc/ali-vol-500g}
             - {name: shm, mountPath: /dev/shm}
