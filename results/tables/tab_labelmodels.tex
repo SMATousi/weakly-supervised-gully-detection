@@ -1,0 +1,24 @@
+\begin{table}[t]
+\centering
+\footnotesize
+\caption{Label models on the development split ($n=150$). The first block uses the three earlier labelers; the other blocks add the Qwen3-VL-32B labeler. In the last block its $P(\mathrm{yes})$ is turned into a vote with an abstention band tuned on the development split. The class prior of every model comes from the development labels. \emph{Post.}: distinct pseudo-label values over the unlabeled pool.}
+\label{tab:labelmodels}
+\begin{tabular}{lcccc}
+\toprule
+Label model & Acc & F1 & PR-AUC & Post. \\
+\midrule
+Majority vote, 3 earlier labelers & 0.667 & 0.719 & 0.690 & -- \\
+Snorkel, 3 earlier labelers & 0.673 & 0.726 & 0.710 & 7 \\
+\midrule
+Majority vote, binary labelers & 0.680 & 0.742 & 0.748 & 6 \\
+Dawid--Skene, binary labelers & 0.687 & 0.764 & 0.765 & 17 \\
+Triplet method, binary labelers & 0.680 & 0.733 & 0.746 & 13 \\
+Snorkel, binary labelers & 0.680 & 0.747 & 0.765 & 17 \\
+\midrule
+Majority vote, confidence-valued 32B & 0.673 & 0.732 & 0.730 & 7 \\
+Dawid--Skene, confidence-valued 32B & 0.687 & 0.759 & 0.789 & 23 \\
+Triplet method, confidence-valued 32B & 0.693 & 0.755 & 0.768 & 20 \\
+Snorkel, confidence-valued 32B & 0.660 & 0.730 & 0.791 & 21 \\
+\bottomrule
+\end{tabular}
+\end{table}
