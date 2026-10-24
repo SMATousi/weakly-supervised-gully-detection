@@ -43,7 +43,8 @@ def f(x: float, d: int = 3) -> str:
 
 def _table(caption: str, label: str, colspec: str, header: str, rows: list[str], star: bool = False) -> str:
     env = "table*" if star else "table"
-    return "\n".join([f"\\begin{{{env}}}[t]", "\\centering", "\\footnotesize", f"\\caption{{{caption}}}",
+    return "\n".join([f"\\begin{{{env}}}[t]", "\\centering", "\\footnotesize", "\\setlength{\\tabcolsep}{3pt}",
+                      f"\\caption{{{caption}}}",
                       f"\\label{{{label}}}", f"\\begin{{tabular}}{{{colspec}}}", "\\toprule", header, "\\midrule",
                       *rows, "\\bottomrule", "\\end{tabular}", f"\\end{{{env}}}", ""])
 
@@ -59,8 +60,8 @@ def gt_table(root: Path) -> str:
     gt = pd.read_parquet(root / "artifacts/gt/gt.parquet")
     ref = pd.read_csv(root / "data/reece_initial_labels.csv")
     m = gt.merge(ref, on="loc_id")
-    names = [("strict_pos", "Strict positive"), ("lenient_pos", "Lenient positive"),
-             ("lenient_neg", "Lenient negative"), ("strict_neg", "Strict negative (main)")]
+    names = [("strict_pos", "Strict pos."), ("lenient_pos", "Lenient pos."),
+             ("lenient_neg", "Lenient neg."), ("strict_neg", "Strict neg. (main)")]
     rows = []
     for key, name in names:
         d = m.dropna(subset=[f"y_{key}"])
@@ -74,7 +75,7 @@ def gt_table(root: Path) -> str:
            "macro-averaged over the two classes (so F1 is not the harmonic mean of the P and R shown); "
            "locations without a defined label are excluded from the agreement columns.")
     return _table(cap, "tab:gt_metrics", "lcccccc",
-                  "Scheme & Pos / Neg & $\\kappa$ & Acc & P (macro) & R (macro) & F1 (macro) \\\\", rows)
+                  "Scheme & Pos / Neg & $\\kappa$ & Acc & P & R & F1 \\\\", rows)
 
 
 def _labeler_metrics(root: Path, stem: str) -> dict:
@@ -88,6 +89,12 @@ def _labeler_metrics(root: Path, stem: str) -> dict:
     m = binary_metrics(y, (lab == 1).astype(float))
     pm = binary_metrics(y, d["p_yes"].to_numpy(dtype=float)) if d["p_yes"].notna().all() else {}
     return {**m, "pos": float((lab == 1).mean()), "roc_auc": pm.get("roc_auc"), "pr_auc": pm.get("pr_auc")}
+
+
+def _pool_pos_rate(root: Path, stem: str) -> float:
+    d = pd.read_json(root / f"artifacts/labels/{stem}.jsonl", lines=True)
+    d = d[d.loc_id.str.startswith("U-")]
+    return float((d.label == 1).mean())
 
 
 def _student_means(root: Path) -> pd.DataFrame:
@@ -130,24 +137,28 @@ def labelmodel_table(root: Path) -> str:
     e0 = json.loads((root / "results/E0/e0_label_model.json").read_text())
     rows = []
 
-    def row(name, m, k=None):
+    def row(name, m):
         rows.append(" & ".join([name, f(m["acc"]), f(m["f1"]), f(m["pr_auc"]),
                                 str(m.get("distinct_pool_posteriors", "--"))]) + " \\\\")
+
+    def block(title):
+        rows.append(f"\\multicolumn{{5}}{{l}}{{\\emph{{{title}}}}} \\\\")
+    block("3 earlier labelers, binary")
     for key, name in (("majority_vote", "Majority vote"), ("dev_prior", "Snorkel")):
         v = e0["variants"][key]
-        row(f"{name}, 3 earlier labelers", {**v["dev"], "distinct_pool_posteriors": v.get("distinct_pool_posteriors", "--")})
-    rows.append("\\midrule")
+        row(name, {**v["dev"], "distinct_pool_posteriors": v.get("distinct_pool_posteriors", "--")})
+    block("+ Qwen3-VL-32B, binary")
     for key, name in (("mv", "Majority vote"), ("ds", "Dawid--Skene"), ("triplet", "Triplet method"),
                       ("snorkel", "Snorkel")):
-        row(f"{name}, binary labelers", e6["binary"][key])
-    rows.append("\\midrule")
+        row(name, e6["binary"][key])
+    block("+ Qwen3-VL-32B, confidence-valued")
     for key, name in (("mv", "Majority vote"), ("ds", "Dawid--Skene"), ("triplet", "Triplet method"),
                       ("snorkel", "Snorkel")):
-        row(f"{name}, confidence-valued 32B", e6["confidence"][f"band_{key}"])
+        row(name, e6["confidence"][f"band_{key}"])
     cap = ("Label models on the development split ($n=150$). The first block uses the three earlier labelers; the "
-           "other blocks add the Qwen3-VL-32B labeler. In the last block its $P(\\mathrm{yes})$ is turned into a vote "
-           "with an abstention band tuned on the development split. The class prior of every model comes from the "
-           "development labels. \\emph{Post.}: distinct pseudo-label values over the unlabeled pool.")
+           "other blocks add the Qwen3-VL-32B labeler, whose $P(\\mathrm{yes})$ is a binary vote (second block) or a "
+           "vote with an abstention band tuned on the development split (third block). The class prior of every "
+           "model comes from the development labels. \\emph{Post.}: distinct pseudo-label values over the pool.")
     return _table(cap, "tab:labelmodels", "lcccc", "Label model & Acc & F1 & PR-AUC & Post. \\\\", rows)
 
 
@@ -183,7 +194,8 @@ def numbers(root: Path) -> str:
     sc = pd.read_parquet(root / "artifacts/gt/scores.parquet")
     main = gt["y_main"].dropna()
     vals = {
-        "nPool": int((idx.loc_id.str[0] == "U").sum()), "nPoolImages": int((idx.loc_id.str[0] == "U").sum()) * 8,
+        "nPool": f"{int((idx.loc_id.str[0] == 'U').sum()):,}".replace(",", "{,}"),
+        "nPoolImages": f"{int((idx.loc_id.str[0] == 'U').sum()) * 8:,}".replace(",", "{,}"),
         "nLabeledLoc": int((idx.loc_id.str[0] == "L").sum()), "nScored": int(sc.legacy_id.nunique()),
         "nDefined": len(main), "nPos": int(main.sum()), "nNeg": int((1 - main).sum()),
         "nDev": int(e1["counts"]["dev"]), "nTest": int(e1["counts"]["test"]),
@@ -205,7 +217,7 @@ def numbers(root: Path) -> str:
     sm = _student_means(root)
     ws = sm[~sm.index.get_level_values(0).str.startswith("single")]
     vals.update({
-        "lcAcc": f(lc["acc"]), "lcROC": f(lc["roc_auc"], 2), "lcPR": f(lc["pr_auc"], 2), "lcPos": f(lc["pos"], 2),
+        "lcAcc": f(lc["acc"]), "lcROC": f(lc["roc_auc"], 2), "lcPR": f(lc["pr_auc"], 2), "lcPos": f(lc["pos"], 2), "lcPrec": f(lc["precision"], 2), "lcRec": f(lc["recall"], 2),
         "lmAcc": f(lm["acc"]), "lmROC": f(lm["roc_auc"], 2), "lmPR": f(lm["pr_auc"], 2), "lmPos": f(lm["pos"], 2),
         "lsmallROC": f(l8["roc_auc"], 2), "lsmallPos": f(l8["pos"], 2), "lmoeROC": f(l30["roc_auc"], 2),
         "lmoePos": f(l30["pos"], 2), "lqAcc": f(lq["acc"]),
@@ -216,6 +228,10 @@ def numbers(root: Path) -> str:
         "lmBandDSPR": f(e6["confidence"]["band_ds"]["pr_auc"], 2),
         "lmPosPoolLow": f(min(e6["binary"][k]["pool_pos_rate"] for k in ("mv", "ds", "triplet", "snorkel")), 2),
         "lmPosPoolHigh": f(max(e6["binary"][k]["pool_pos_rate"] for k in ("mv", "ds", "triplet", "snorkel")), 2),
+        "pPoolLlama": f(_pool_pos_rate(root, "legacy_llama3.2-v-90b_sq"), 2),
+        "pPoolQwen": f(_pool_pos_rate(root, "legacy_qwen2.5-vl-72b_sq"), 2),
+        "pPoolThirtyTwo": f(_pool_pos_rate(root, "qwen3-vl-32b-fp8_sq_multiimg__sq_v4"), 2),
+        "pDevLlama": f(_labeler_metrics(root, "legacy_llama3.2-v-90b_sq")["pos"], 2),
         "stDistPR": f(sm.loc[("single_q32hard", "temporal"), "pr_auc"], 2),
         "stDistAcc": f(sm.loc[("single_q32hard", "temporal"), "acc"], 2),
         "stWSBestPR": f(ws["pr_auc"].max(), 2), "stWSBestAcc": f(ws["acc"].max(), 2),
