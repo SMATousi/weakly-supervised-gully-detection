@@ -63,3 +63,25 @@ class SoftLogitAggregator:
 
     def predict_proba(self, P: np.ndarray) -> np.ndarray:
         return self.lr.predict_proba(self._x(P))
+
+
+def fold_ids(n: int, n_folds: int = 5, seed: int = 0) -> np.ndarray:
+    """Deterministic fold assignment 0..n_folds-1 for n development locations."""
+    return np.random.default_rng(seed).permutation(n) % n_folds
+
+
+def crossfit_band(p_dev: np.ndarray, y_dev: np.ndarray, min_coverage: float = 0.5, n_folds: int = 5,
+                  seed: int = 0) -> np.ndarray:
+    """Abstention-band votes for the development locations, each from a band tuned WITHOUT that location's fold.
+
+    Tuning a band on the development labels and scoring the votes on the same labels is optimistic; with many
+    tuned labelers it is badly so. This gives honest development-split votes.
+    """
+    p_dev, y_dev = np.asarray(p_dev, dtype=float), np.asarray(y_dev)
+    folds = fold_ids(len(p_dev), n_folds, seed)
+    votes = np.full(len(p_dev), -1, dtype=int)
+    for k in range(n_folds):
+        tr, te = folds != k, folds == k
+        (lo, hi), _ = tune_band(p_dev[tr], y_dev[tr], min_coverage)
+        votes[te] = abstain_band(p_dev[te], lo, hi)
+    return votes

@@ -40,8 +40,26 @@ def apply_lf(fit: dict, x: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     return votes, np.where(np.isnan(z), 0.5, p)
 
 
-def build_records(df: pd.DataFrame, feature: str, fit: dict) -> list[dict]:
+def crossfit_dev(x_dev: np.ndarray, y_dev: np.ndarray, n_folds: int = 5, seed: int = 0):
+    """Out-of-fold (votes, p_yes) for the development locations: each from a labeler fitted without its own fold."""
+    from gully.ws.confidence_lfs import fold_ids
+
+    folds = fold_ids(len(x_dev), n_folds, seed)
+    votes, p = np.full(len(x_dev), -1, dtype=int), np.full(len(x_dev), 0.5)
+    for k in range(n_folds):
+        tr, te = folds != k, folds == k
+        v, pp = apply_lf(fit_lf(x_dev[tr], y_dev[tr]), x_dev[te])
+        votes[te], p[te] = v, pp
+    return votes, p
+
+
+def build_records(df: pd.DataFrame, feature: str, fit: dict, override: dict | None = None) -> list[dict]:
+    """Records for every row of df; `override` maps loc_id -> (vote, p_yes) (the out-of-fold values for dev rows)."""
     votes, p = apply_lf(fit, df[feature].to_numpy(dtype=float))
+    if override:
+        for i, loc in enumerate(df.loc_id):
+            if loc in override:
+                votes[i], p[i] = override[loc]
     return [{"loc_id": loc, "labeler": f"dem_{feature}", "model": "DEM", "revision": None, "prompt_id": "terrain",
              "image_mode": "dem", "raw": "", "label": int(v), "p_yes": float(pp), "abstain": bool(v == -1),
              "latency_s": None, "ts": None} for loc, v, pp in zip(df.loc_id, votes, p, strict=True)]

@@ -1,0 +1,299 @@
+{
+  "n_dev": 150,
+  "features": {
+    "twi_max": {
+      "sign": 1.0,
+      "dev_auc_in_sample": 0.628,
+      "dev_auc_out_of_fold": 0.629,
+      "band": [
+        13.09463822063031,
+        14.633191408528788
+      ],
+      "dev_acc_covered": 0.615,
+      "dev_coverage": 0.52,
+      "pool_coverage": 0.559,
+      "pool_pos_rate": 0.8,
+      "labeled_pos_rate": 0.611
+    },
+    "twi_p90": {
+      "sign": 1.0,
+      "dev_auc_in_sample": 0.535,
+      "dev_auc_out_of_fold": 0.459,
+      "band": [
+        7.278512675399196,
+        7.503679232925195
+      ],
+      "dev_acc_covered": 0.544,
+      "dev_coverage": 0.76,
+      "pool_coverage": 0.92,
+      "pool_pos_rate": 0.825,
+      "labeled_pos_rate": 0.605
+    },
+    "spi_p99": {
+      "sign": 1.0,
+      "dev_auc_in_sample": 0.513,
+      "dev_auc_out_of_fold": 0.412,
+      "band": [
+        14.185860779800166,
+        50.01108795677331
+      ],
+      "dev_acc_covered": 0.526,
+      "dev_coverage": 0.76,
+      "pool_coverage": 0.5,
+      "pool_pos_rate": 0.496,
+      "labeled_pos_rate": 0.812
+    },
+    "acc_max": {
+      "sign": 1.0,
+      "dev_auc_in_sample": 0.67,
+      "dev_auc_out_of_fold": 0.672,
+      "band": [
+        3484.44,
+        5501.772
+      ],
+      "dev_acc_covered": 0.644,
+      "dev_coverage": 0.673,
+      "pool_coverage": 0.743,
+      "pool_pos_rate": 0.72,
+      "labeled_pos_rate": 0.799
+    },
+    "frac_acc_500": {
+      "sign": -1.0,
+      "dev_auc_in_sample": 0.507,
+      "dev_auc_out_of_fold": 0.422,
+      "band": [
+        -0.034184570312499996,
+        -0.030120849609375
+      ],
+      "dev_acc_covered": 0.404,
+      "dev_coverage": 0.693,
+      "pool_coverage": 0.869,
+      "pool_pos_rate": 0.872,
+      "labeled_pos_rate": 0.783
+    },
+    "frac_acc_100": {
+      "sign": -1.0,
+      "dev_auc_in_sample": 0.532,
+      "dev_auc_out_of_fold": 0.455,
+      "band": [
+        -0.08989404296875,
+        -0.074123291015625
+      ],
+      "dev_acc_covered": 0.405,
+      "dev_coverage": 0.56,
+      "pool_coverage": 0.59,
+      "pool_pos_rate": 0.704,
+      "labeled_pos_rate": 0.468
+    },
+    "plan_curv_min": {
+      "sign": 1.0,
+      "dev_auc_in_sample": 0.55,
+      "dev_auc_out_of_fold": 0.549,
+      "band": [
+        -0.10997106213519886,
+        -0.06423355585706983
+      ],
+      "dev_acc_covered": 0.607,
+      "dev_coverage": 0.593,
+      "pool_coverage": 0.757,
+      "pool_pos_rate": 0.663,
+      "labeled_pos_rate": 0.612
+    },
+    "prof_curv_min": {
+      "sign": 1.0,
+      "dev_auc_in_sample": 0.566,
+      "dev_auc_out_of_fold": 0.564,
+      "band": [
+        -0.15510675281617145,
+        -0.10571875756680031
+      ],
+      "dev_acc_covered": 0.621,
+      "dev_coverage": 0.687,
+      "pool_coverage": 0.813,
+      "pool_pos_rate": 0.642,
+      "labeled_pos_rate": 0.559
+    },
+    "lap_p98": {
+      "sign": -1.0,
+      "dev_auc_in_sample": 0.563,
+      "dev_auc_out_of_fold": 0.561,
+      "band": [
+        -0.3195105555314806,
+        -0.15099538617658276
+      ],
+      "dev_acc_covered": 0.643,
+      "dev_coverage": 0.56,
+      "pool_coverage": 0.68,
+      "pool_pos_rate": 0.771,
+      "labeled_pos_rate": 0.748
+    },
+    "frac_concave": {
+      "sign": -1.0,
+      "dev_auc_in_sample": 0.57,
+      "dev_auc_out_of_fold": 0.57,
+      "band": [
+        -0.24611083984375,
+        -0.16571044921875
+      ],
+      "dev_acc_covered": 0.636,
+      "dev_coverage": 0.66,
+      "pool_coverage": 0.799,
+      "pool_pos_rate": 0.819,
+      "labeled_pos_rate": 0.712
+    },
+    "sink_depth_max": {
+      "sign": -1.0,
+      "dev_auc_in_sample": 0.578,
+      "dev_auc_out_of_fold": 0.576,
+      "band": [
+        -0.01040812988281914,
+        -0.0033280517578191393
+      ],
+      "dev_acc_covered": 0.595,
+      "dev_coverage": 0.873,
+      "pool_coverage": 0.922,
+      "pool_pos_rate": 0.025,
+      "labeled_pos_rate": 0.087
+    },
+    "tpi5_min": {
+      "sign": 1.0,
+      "dev_auc_in_sample": 0.5,
+      "dev_auc_out_of_fold": 0.469,
+      "band": [
+        -0.43280322638911434,
+        -0.12687178637289961
+      ],
+      "dev_acc_covered": 0.606,
+      "dev_coverage": 0.847,
+      "pool_coverage": 0.667,
+      "pool_pos_rate": 0.858,
+      "labeled_pos_rate": 0.909
+    },
+    "tpi15_min": {
+      "sign": -1.0,
+      "dev_auc_in_sample": 0.53,
+      "dev_auc_out_of_fold": 0.469,
+      "band": [
+        0.10839882715574764,
+        0.10839882715574764
+      ],
+      "dev_acc_covered": 0.578,
+      "dev_coverage": 0.773,
+      "pool_coverage": 1.0,
+      "pool_pos_rate": 0.753,
+      "labeled_pos_rate": 0.901
+    },
+    "tpi15_frac_hollow": {
+      "sign": 1.0,
+      "dev_auc_in_sample": 0.543,
+      "dev_auc_out_of_fold": 0.542,
+      "band": [
+        0.0,
+        0.06109619140625
+      ],
+      "dev_acc_covered": 0.663,
+      "dev_coverage": 0.593,
+      "pool_coverage": 0.649,
+      "pool_pos_rate": 0.757,
+      "labeled_pos_rate": 0.899
+    },
+    "resid_p01": {
+      "sign": 1.0,
+      "dev_auc_in_sample": 0.519,
+      "dev_auc_out_of_fold": 0.462,
+      "band": [
+        -1.9611753414415432,
+        -0.8751424983751632
+      ],
+      "dev_acc_covered": 0.578,
+      "dev_coverage": 0.773,
+      "pool_coverage": 0.752,
+      "pool_pos_rate": 0.794,
+      "labeled_pos_rate": 0.694
+    },
+    "resid_std": {
+      "sign": 1.0,
+      "dev_auc_in_sample": 0.518,
+      "dev_auc_out_of_fold": 0.517,
+      "band": [
+        0.11311701558859656,
+        0.11311701558859656
+      ],
+      "dev_acc_covered": 0.647,
+      "dev_coverage": 1.0,
+      "pool_coverage": 1.0,
+      "pool_pos_rate": 0.775,
+      "labeled_pos_rate": 0.891
+    },
+    "slope_p90": {
+      "sign": -1.0,
+      "dev_auc_in_sample": 0.545,
+      "dev_auc_out_of_fold": 0.544,
+      "band": [
+        -0.10762841774825896,
+        -0.08200670682212934
+      ],
+      "dev_acc_covered": 0.582,
+      "dev_coverage": 0.653,
+      "pool_coverage": 0.888,
+      "pool_pos_rate": 0.669,
+      "labeled_pos_rate": 0.47
+    },
+    "relief": {
+      "sign": 1.0,
+      "dev_auc_in_sample": 0.504,
+      "dev_auc_out_of_fold": 0.426,
+      "band": [
+        1.3953678588867189,
+        1.3953678588867189
+      ],
+      "dev_acc_covered": 0.576,
+      "dev_coverage": 0.787,
+      "pool_coverage": 1.0,
+      "pool_pos_rate": 0.761,
+      "labeled_pos_rate": 0.905
+    },
+    "tri_mean": {
+      "sign": -1.0,
+      "dev_auc_in_sample": 0.549,
+      "dev_auc_out_of_fold": 0.547,
+      "band": [
+        -0.0806414591986686,
+        -0.042247531509958205
+      ],
+      "dev_acc_covered": 0.589,
+      "dev_coverage": 0.6,
+      "pool_coverage": 0.791,
+      "pool_pos_rate": 0.899,
+      "labeled_pos_rate": 0.873
+    },
+    "aspect_circ_var": {
+      "sign": 1.0,
+      "dev_auc_in_sample": 0.626,
+      "dev_auc_out_of_fold": 0.624,
+      "band": [
+        0.06122574947082322,
+        0.25875921522234874
+      ],
+      "dev_acc_covered": 0.654,
+      "dev_coverage": 0.54,
+      "pool_coverage": 0.845,
+      "pool_pos_rate": 0.899,
+      "labeled_pos_rate": 0.918
+    },
+    "channel_plan_curv_min": {
+      "sign": -1.0,
+      "dev_auc_in_sample": 0.509,
+      "dev_auc_out_of_fold": 0.445,
+      "band": [
+        0.01811688923798367,
+        0.05007636895179731
+      ],
+      "dev_acc_covered": 0.577,
+      "dev_coverage": 0.647,
+      "pool_coverage": 0.682,
+      "pool_pos_rate": 0.803,
+      "labeled_pos_rate": 0.909
+    }
+  }
+}

@@ -28,3 +28,19 @@ def test_records_format():
     df = pd.DataFrame({"loc_id": [f"L-{i:06d}" for i in range(50)], "twi_max": x})
     recs = build_records(df, "twi_max", fit_lf(x, y))
     assert len(recs) == 50 and recs[0]["labeler"] == "dem_twi_max" and set(recs[0]) >= {"loc_id", "label", "p_yes", "abstain"}
+
+
+def test_crossfit_removes_the_optimism_of_tuning_on_noise():
+    from gully.ws.confidence_lfs import abstain_band, crossfit_band, tune_band
+
+    r = np.random.default_rng(1)
+    accs_in, accs_oof = [], []
+    for _ in range(30):
+        p, y = r.uniform(0, 1, 150), r.integers(0, 2, 150)  # a labeler with no signal at all
+        (lo, hi), _ = tune_band(p, y, 0.5)
+        v = abstain_band(p, lo, hi)
+        accs_in.append((v[v != -1] == y[v != -1]).mean())
+        o = crossfit_band(p, y, 0.5)
+        accs_oof.append((o[o != -1] == y[o != -1]).mean())
+    assert np.mean(accs_in) > 0.54          # in-sample tuning finds spurious "signal"
+    assert abs(np.mean(accs_oof) - 0.5) < 0.04  # cross-fitted votes do not
