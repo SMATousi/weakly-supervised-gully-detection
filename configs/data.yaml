@@ -10,6 +10,11 @@ pvc_test: ali-vol-1tera
 test:
   root: other-pvcs/final_pos_neg_test_data_merging_25_2   # all_tiles/, pos/, neg/
   rgb_images: other-pvcs/final_pos_neg_test_data_merging_25_2/all_tiles  # 548 locations x 8 (rgb_0..6, rgb_11 = high-res)
+# DEM tiles (128 x 128, ~0.91 m, same grid as the NAIP tiles; from Earth Engine USGS/3DEP/1m): pool in `pool.dem`;
+# labeled tiles sit beside the RGB folders, in pos/dem or neg/dem (membership = data/reece_initial_labels.csv).
+test_dem:
+  pos: other-pvcs/final_pos_neg_test_data_merging_25_2/pos/dem
+  neg: other-pvcs/final_pos_neg_test_data_merging_25_2/neg/dem
 # Other copies (do not use): ali-vol-1tera/other-pvcs/large_unlabeled_dataset (root-only perms),
 # large_data.tar.gz, A2*, ali-vol-500g/test_data_8_images.tar.gz (not gzip; unreadable as .tar.gz).
 

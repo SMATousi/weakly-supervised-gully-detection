@@ -36,6 +36,8 @@ def main() -> None:
     ap.add_argument("--index", default="artifacts/index/locations.parquet")
     ap.add_argument("--gt", default="artifacts/gt/gt.parquet")
     ap.add_argument("--min-coverage", type=float, default=0.5)
+    ap.add_argument("--band-lfs", nargs="*", help="labelers whose P(yes) is turned into an abstention-band vote (default: every "
+                    "labeler with a P(yes)); the DEM labelers are already banded and must not be listed")
     ap.add_argument("--out", default="results/E6")
     ap.add_argument("--ws-out", default="artifacts/ws")
     a = ap.parse_args()
@@ -58,6 +60,8 @@ def main() -> None:
         pd.DataFrame({"loc_id": pool, "p1": p_pool}).to_parquet(Path(a.ws_out) / f"pseudo_{name}_{a.lfset}.parquet")
 
     scored = [n for n in a.lfs if len(P[n].dropna()) > 0] if not P.empty else []
+    if a.band_lfs is not None:
+        scored = [n for n in scored if n in a.band_lfs]
     if scored:
         Hc = H.copy()
         bands = {}

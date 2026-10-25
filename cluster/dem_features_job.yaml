@@ -1,0 +1,36 @@
+# CPU-only job: terrain attributes for all 18,727 locations (file reads dominate: 32 workers on 4 CPUs, sized to stay above the 20% utilization rule). Written to the volume.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: gully-dem-features
+spec:
+  backoffLimit: 3
+  ttlSecondsAfterFinished: 604800
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: dem
+        image: python:3.11-slim
+        workingDir: /pvc/ali-vol-500g/gully/code
+        command: [/bin/bash, -c]
+        args:
+        - |
+          set -e
+          (apt-get update -qq && apt-get install -y -qq libexpat1) >/dev/null 2>&1 || true
+          pip install -q numpy scipy pandas pyarrow rasterio 2>&1 | tail -1
+          pip install -q -e . --no-deps
+          python scripts/extract_dem_features.py --pool-dem /pvc/ali-vol-500g/large_unlabeled_dataset/dem \
+            --test-root /pvc/ali-vol-1tera/other-pvcs/final_pos_neg_test_data_merging_25_2 \
+            --out /pvc/ali-vol-500g/gully/dem/dem_features.parquet --workers 32
+        resources:
+          limits: {cpu: '4', memory: 4Gi}
+          requests: {cpu: '4', memory: 4Gi}
+        volumeMounts:
+        - {name: v500, mountPath: /pvc/ali-vol-500g}
+        - {name: v1t, mountPath: /pvc/ali-vol-1tera, readOnly: true}
+      volumes:
+      - name: v500
+        persistentVolumeClaim: {claimName: ali-vol-500g}
+      - name: v1t
+        persistentVolumeClaim: {claimName: ali-vol-1tera, readOnly: true}

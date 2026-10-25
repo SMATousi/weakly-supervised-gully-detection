@@ -60,7 +60,7 @@ Owner: **C** Claude, **H** human, **GPU** unattended job.
 
 **D4-D6: cheap labelers**
 - [ ] C: **E4** CLIP / RemoteCLIP / GeoRSCLIP labelers
-- [ ] C: **E5** terrain labeler from the DEM tiles (P2). Blocked: DEM exists for the 18,179 pool locations only, none for the 548 labeled ones, so it cannot be validated on dev. Cut unless DEM for the labeled tiles can be obtained
+- [ ] C: **E5** DEM-based labelers (in progress, 2026-10-25). Correction: the DEM tiles DO exist for the labeled locations (`pos/dem` 325, `neg/dem` 225 beside the RGB folders; the earlier "blocked" note was wrong because only `all_tiles` had been listed). Same 128 x 128 / 0.91 m grid as NAIP, from Earth Engine USGS/3DEP/1m. Code: `data/dem.py` (35 terrain attributes), `labelers/dem.py` (21 labelers: direction, abstention band and score map fitted on dev only), `scripts/extract_dem_features.py`, `scripts/make_dem_labelers.py`
 
 **D5-D7: student**
 - [x] C: `student/heads.py` (linear, mean-pool MLP, temporal attention) and `train.py` (dev-based selection), toy-tested
