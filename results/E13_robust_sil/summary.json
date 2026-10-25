@@ -1,0 +1,134 @@
+{
+  "means": {
+    "('acc', 'mean')": {
+      "('single_q32soft', 'mlp', 'all_kl')": 0.64,
+      "('single_q32soft', 'mlp', 'drop_gce')": 0.62,
+      "('single_q32soft', 'mlp', 'sil_early')": 0.613,
+      "('single_q32soft', 'mlp', 'sil_late')": 0.596,
+      "('single_q32soft', 'temporal', 'all_kl')": 0.671,
+      "('single_q32soft', 'temporal', 'drop_gce')": 0.589,
+      "('single_q32soft', 'temporal', 'sil_early')": 0.591,
+      "('single_q32soft', 'temporal', 'sil_late')": 0.596
+    },
+    "('acc', 'std')": {
+      "('single_q32soft', 'mlp', 'all_kl')": 0.027,
+      "('single_q32soft', 'mlp', 'drop_gce')": 0.035,
+      "('single_q32soft', 'mlp', 'sil_early')": 0.024,
+      "('single_q32soft', 'mlp', 'sil_late')": 0.034,
+      "('single_q32soft', 'temporal', 'all_kl')": 0.017,
+      "('single_q32soft', 'temporal', 'drop_gce')": 0.01,
+      "('single_q32soft', 'temporal', 'sil_early')": 0.008,
+      "('single_q32soft', 'temporal', 'sil_late')": 0.019
+    },
+    "('f1', 'mean')": {
+      "('single_q32soft', 'mlp', 'all_kl')": 0.633,
+      "('single_q32soft', 'mlp', 'drop_gce')": 0.673,
+      "('single_q32soft', 'mlp', 'sil_early')": 0.677,
+      "('single_q32soft', 'mlp', 'sil_late')": 0.584,
+      "('single_q32soft', 'temporal', 'all_kl')": 0.626,
+      "('single_q32soft', 'temporal', 'drop_gce')": 0.635,
+      "('single_q32soft', 'temporal', 'sil_early')": 0.569,
+      "('single_q32soft', 'temporal', 'sil_late')": 0.629
+    },
+    "('f1', 'std')": {
+      "('single_q32soft', 'mlp', 'all_kl')": 0.068,
+      "('single_q32soft', 'mlp', 'drop_gce')": 0.064,
+      "('single_q32soft', 'mlp', 'sil_early')": 0.033,
+      "('single_q32soft', 'mlp', 'sil_late')": 0.092,
+      "('single_q32soft', 'temporal', 'all_kl')": 0.037,
+      "('single_q32soft', 'temporal', 'drop_gce')": 0.045,
+      "('single_q32soft', 'temporal', 'sil_early')": 0.041,
+      "('single_q32soft', 'temporal', 'sil_late')": 0.075
+    },
+    "('roc_auc', 'mean')": {
+      "('single_q32soft', 'mlp', 'all_kl')": 0.729,
+      "('single_q32soft', 'mlp', 'drop_gce')": 0.652,
+      "('single_q32soft', 'mlp', 'sil_early')": 0.634,
+      "('single_q32soft', 'mlp', 'sil_late')": 0.663,
+      "('single_q32soft', 'temporal', 'all_kl')": 0.732,
+      "('single_q32soft', 'temporal', 'drop_gce')": 0.638,
+      "('single_q32soft', 'temporal', 'sil_early')": 0.666,
+      "('single_q32soft', 'temporal', 'sil_late')": 0.662
+    },
+    "('roc_auc', 'std')": {
+      "('single_q32soft', 'mlp', 'all_kl')": 0.015,
+      "('single_q32soft', 'mlp', 'drop_gce')": 0.016,
+      "('single_q32soft', 'mlp', 'sil_early')": 0.023,
+      "('single_q32soft', 'mlp', 'sil_late')": 0.012,
+      "('single_q32soft', 'temporal', 'all_kl')": 0.013,
+      "('single_q32soft', 'temporal', 'drop_gce')": 0.018,
+      "('single_q32soft', 'temporal', 'sil_early')": 0.047,
+      "('single_q32soft', 'temporal', 'sil_late')": 0.012
+    },
+    "('pr_auc', 'mean')": {
+      "('single_q32soft', 'mlp', 'all_kl')": 0.726,
+      "('single_q32soft', 'mlp', 'drop_gce')": 0.632,
+      "('single_q32soft', 'mlp', 'sil_early')": 0.612,
+      "('single_q32soft', 'mlp', 'sil_late')": 0.627,
+      "('single_q32soft', 'temporal', 'all_kl')": 0.772,
+      "('single_q32soft', 'temporal', 'drop_gce')": 0.658,
+      "('single_q32soft', 'temporal', 'sil_early')": 0.671,
+      "('single_q32soft', 'temporal', 'sil_late')": 0.676
+    },
+    "('pr_auc', 'std')": {
+      "('single_q32soft', 'mlp', 'all_kl')": 0.038,
+      "('single_q32soft', 'mlp', 'drop_gce')": 0.018,
+      "('single_q32soft', 'mlp', 'sil_early')": 0.024,
+      "('single_q32soft', 'mlp', 'sil_late')": 0.017,
+      "('single_q32soft', 'temporal', 'all_kl')": 0.001,
+      "('single_q32soft', 'temporal', 'drop_gce')": 0.021,
+      "('single_q32soft', 'temporal', 'sil_early')": 0.027,
+      "('single_q32soft', 'temporal', 'sil_late')": 0.015
+    }
+  },
+  "sil_late_phase": [
+    {
+      "head": "mlp",
+      "seed": 0,
+      "best_warmup": 0.6075107695,
+      "best_after": 0.5869967811,
+      "after_wins": false,
+      "pr_last_epoch": 0.5525734191
+    },
+    {
+      "head": "mlp",
+      "seed": 1,
+      "best_warmup": 0.6395782598,
+      "best_after": 0.6368521366,
+      "after_wins": false,
+      "pr_last_epoch": 0.5651853729
+    },
+    {
+      "head": "mlp",
+      "seed": 2,
+      "best_warmup": 0.6330263511,
+      "best_after": 0.6122715421,
+      "after_wins": false,
+      "pr_last_epoch": 0.5674340845
+    },
+    {
+      "head": "temporal",
+      "seed": 0,
+      "best_warmup": 0.677517146,
+      "best_after": 0.6569855691,
+      "after_wins": false,
+      "pr_last_epoch": 0.6075694705
+    },
+    {
+      "head": "temporal",
+      "seed": 1,
+      "best_warmup": 0.6730885038,
+      "best_after": 0.6901360512,
+      "after_wins": true,
+      "pr_last_epoch": 0.6246486438
+    },
+    {
+      "head": "temporal",
+      "seed": 2,
+      "best_warmup": 0.6597442911,
+      "best_after": 0.6446950352,
+      "after_wins": false,
+      "pr_last_epoch": 0.6276176921
+    }
+  ]
+}

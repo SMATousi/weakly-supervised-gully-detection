@@ -190,3 +190,23 @@ Yes-biased under both prompts and poor at ranking (ROC-AUC ~0.66, like the 8B), 
 - **Collage beats multi-image by ~6 points of accuracy and ~0.04 ROC-AUC on both prompts.** The legacy collage presentation was not a flaw for this model: the one-image grid with year labels works better than 8 separate images (precision 0.88-0.91, recall ~0.5: conservative). This is a finding for the paper (E2) and corrects my prior assumption that multi-image would win.
 - Error correlation collage vs multi-image (sq_v4): 0.47; collage vs legacy Qwen-72B: -0.06. Two views of the same model are moderately different voters.
 - Chosen on dev: **collage + sq_v4**. Pool run launched (4 shards x 2 GPUs). Both views of the 32B can then be labeling functions.
+
+### E13: noise-robust and student-in-the-loop training, wave 1 (2026-10-25; `scripts/run_robust.py`, `scripts/analyze_e13.py`, `results/E13_robust_sil/`; dev n=150, mean +- std over 3 seeds)
+Setup: the same frozen FlexiViT-S features and training recipe as E7; pseudo-labels = the 32B labeler's `P(yes)` (multi-image; 143 distinct values); confidence of a pseudo-label = |p - 0.5|; the **confident set is the 50% most confident of each pseudo-class** (class-balanced, ties kept: 9,090 of 18,179 locations); robust loss = generalized cross-entropy, q = 0.7; the "student" that labels uncertain samples is an exponential moving average (decay 0.995) of the head, sharpened with temperature 0.5, with its weight ramped in over 5 epochs. Code: `src/gully/student/robust.py` (47 tests pass). Jobs: 4 x (1 GPU, 4 CPU, 12 Gi) with the scheduling shape of the `smatousi-yieldsat-protocol-own3` jobs (A10 / RTX 3090 / RTX 4090 only, a 19-host exclusion list).
+
+| Training | Head | Acc | F1 | ROC-AUC | PR-AUC |
+|---|---|---|---|---|---|
+| All samples, KL (reference; reproduces the E7 student: 0.662 / 0.782) | temporal | 0.671 +- 0.017 | 0.626 | 0.732 | **0.772 +- 0.001** |
+| V1: confident only + robust loss | temporal | 0.589 +- 0.010 | 0.635 | 0.638 | 0.658 +- 0.021 |
+| V2: student labels the uncertain, after a 10-epoch warm-up | temporal | 0.596 +- 0.019 | 0.629 | 0.662 | 0.676 +- 0.015 |
+| V3: student labels the uncertain, from epoch 0 | temporal | 0.591 +- 0.008 | 0.569 | 0.666 | 0.671 +- 0.027 |
+| All samples, KL (reference) | MLP | 0.640 +- 0.027 | 0.633 | 0.729 | 0.726 +- 0.038 |
+| V1 | MLP | 0.620 +- 0.035 | 0.673 | 0.652 | 0.632 +- 0.018 |
+| V2 | MLP | 0.596 +- 0.034 | 0.584 | 0.663 | 0.627 +- 0.017 |
+| V3 | MLP | 0.613 +- 0.024 | 0.677 | 0.634 | 0.612 +- 0.024 |
+
+- **Negative result: none of V1, V2, V3 improves on plain distillation; all lose 0.05-0.11 PR-AUC** (several standard deviations), for both heads. The recipe is sound: the reference row reproduces the earlier E7 student.
+- **V2 phase analysis:** the second phase (the student labels the uncertain samples) beat the best warm-up epoch in only 1 of 6 runs; the selected epoch was usually before the student targets began (mean best epoch ~8 against warm-up 10), so V2's score is mostly the V1-like warm-up model.
+- **Hypotheses, untested:** (a) the VLM's confidence is not aligned with its correctness: P(yes) is near 0 or 1 for many locations, so the confident half is where its yes-bias is strongest, and the less-confident half carries the ranking information that dropping removes (and halves the training set); (b) the student's own targets on the uncertain half reinforce its errors; (c) GCE on near-saturated labels adds little.
+- **Not yet run (wave 2, open):** the controls `all_gce` (robust loss only) and `drop_kl` (dropping only), which attribute the loss to dropping or to the loss; the same grid on the label-model pseudo-labels (`band_snorkel_legacy3_q32`); a sweep of the kept fraction (0.3 / 0.7 / 0.9). Also not tested: confidence defined by agreement between labelers instead of by one labeler's probability.
+- **Cluster note:** all new pods were refused for ~30 minutes by the NRP utilization-flag admission webhook (`pod.nrp-nautilus.io` / `job.nrp-nautilus.io`) at the start; after it cleared, the first job was placed within a minute. Keep helper pods short-lived and right-sized (the flag is account-wide).

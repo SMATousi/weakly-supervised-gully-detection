@@ -89,7 +89,9 @@ Owner: **C** Claude, **H** human, **GPU** unattended job.
 - [ ] D10-D11 C: **E10** ablations (backbone, resolution, dates); **E12** Reece-supervised + supervised CV upper bound
 - [ ] D11-D12 C: **E8** #LF curve; **E9** data scaling
 - [ ] D12-D13 C/GPU: **E14** efficiency; **E15** qualitative figures + attention maps; GT-robustness table
-- [ ] D13-D14 C: P2 only if all green: E13 self-training, Qwen3-VL-235B
+- [x] E13 wave 1 (robust loss + dropping, student in the loop late / early; temporal + MLP; 3 seeds): negative result, all three below plain distillation (`03-experiments.md`)
+- [ ] E13 wave 2: controls (robust loss only, dropping only), label-model pseudo-labels, kept-fraction sweep
+- [ ] D13-D14 C: P2 only if all green: Qwen3-VL-235B
 - [ ] D14 C: final test evaluation: one `evaluate.py` run per final config; bootstrap CIs, McNemar
 - [ ] D15 H+C: **Gate G3, experiment freeze**; tables regenerate from `results/` with one command (`scripts/make_tables.py`, `eval/report.py` written; main test table plugs in once `results/final/*.json` exist)
 
