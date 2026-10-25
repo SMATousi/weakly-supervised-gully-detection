@@ -14,7 +14,7 @@ def main() -> None:
     root, out = REPO_ROOT, Path(a.out)
     out.mkdir(parents=True, exist_ok=True)
     files = {"tab_gt.tex": paper.gt_table(root), "tab_labelers.tex": paper.labeler_table(root),
-             "tab_labelmodels.tex": paper.labelmodel_table(root), "tab_students.tex": paper.student_table(root),
+             "tab_labelmodels.tex": paper.labelmodel_table(root), "tab_students.tex": paper.student_table(root), "tab_robust.tex": paper.robust_table(root),
              "numbers.tex": paper.numbers(root)}
     for name, text in files.items():
         (out / name).write_text(text)

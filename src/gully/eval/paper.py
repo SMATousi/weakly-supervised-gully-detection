@@ -187,6 +187,58 @@ def student_table(root: Path) -> str:
                   star=True)
 
 
+E13_MODES = {
+    "all_kl": "All samples, KL (reference)",
+    "all_gce": "All samples, robust loss",
+    "drop_kl": "Confident only, KL",
+    "drop_gce": "V1: confident only, robust loss",
+    "sil_late": "V2: student labels the uncertain, after warm-up",
+    "sil_early": "V3: student labels the uncertain, from the start",
+}
+E13_SOURCES = {"single_q32soft": "32B labeler $P(\\mathrm{yes})$", "band_snorkel_legacy3_q32": "Snorkel, confidence-valued 32B"}
+
+
+def robust_means(root: Path) -> pd.DataFrame:
+    runs = []
+    for fp in glob.glob(str(root / "results/E13_robust_sil/*.json")):
+        d = json.loads(Path(fp).read_text())
+        if d.get("keep_frac") != 0.5 or d["run"].count("__") != 3:  # main grid only (sweeps carry a tag)
+            continue
+        runs.append({"pseudo": d["pseudo"], "mode": d["mode"], "head": d["head"],
+                     **{k: d["dev"][k] for k in ("acc", "f1", "roc_auc", "pr_auc")}})
+    if not runs:
+        return pd.DataFrame()
+    g = pd.DataFrame(runs).groupby(["pseudo", "mode", "head"])
+    return g.agg(["mean", "std"])
+
+
+def robust_table(root: Path) -> str:
+    m = robust_means(root)
+    if m.empty:
+        return "\\TODO{robust and student-in-the-loop results pending}\n"
+    rows = []
+    for src, sname in E13_SOURCES.items():
+        if src not in m.index.get_level_values(0):
+            continue
+        rows.append(f"\\multicolumn{{5}}{{l}}{{\\emph{{Pseudo-labels: {sname}}}}} \\\\")
+        for mode, mname in E13_MODES.items():
+            cells = []
+            for head in ("mlp", "temporal"):
+                if (src, mode, head) in m.index:
+                    r = m.loc[(src, mode, head)]
+                    cells += [f"{r[('acc', 'mean')]:.3f}$\\pm${r[('acc', 'std')]:.3f}",
+                              f"{r[('pr_auc', 'mean')]:.3f}$\\pm${r[('pr_auc', 'std')]:.3f}"]
+                else:
+                    cells += ["--", "--"]
+            rows.append(" & ".join([mname, *cells]) + " \\\\")
+    cap = ("Noise-robust and student-in-the-loop training on the development split ($n=150$; mean $\\pm$ standard "
+           "deviation over 3 seeds). ``Confident'' keeps the 50\\% most confident pseudo-labels of each class; the "
+           "robust loss is generalized cross-entropy ($q=0.7$); in V2 and V3 the uncertain locations are labeled by "
+           "an exponential moving average of the student itself, starting after 10 epochs (V2) or at epoch 0 (V3).")
+    return _table(cap, "tab:robust", "lcccc", "Training & \\multicolumn{2}{c}{MLP} & \\multicolumn{2}{c}{Temporal} \\\\\n"
+                  " & Acc & PR-AUC & Acc & PR-AUC \\\\", rows, star=True)
+
+
 def numbers(root: Path) -> str:
     idx = pd.read_parquet(root / "artifacts/index/locations.parquet")
     gt = pd.read_parquet(root / "artifacts/gt/gt.parquet")
