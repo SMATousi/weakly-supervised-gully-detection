@@ -1,0 +1,68 @@
+# Student training jobs on cached features. The scheduling shape is copied from the working
+# smatousi-yieldsat-protocol-own3 job (geo-yield-prediction/cluster/nautilus): A10 / RTX 3090 / RTX 4090 only, a hard
+# exclusion list of problem nodes (that job's list plus two nodes found here), 1 GPU, 80 Gi scratch, and 4 CPU / 12 Gi (smaller than own3 so that the pod uses >= 20% of its RAM request: the features live on the GPU),
+# limits = requests, a large backoffLimit and a 7-day TTL. Fill with cluster/submit_robust.sh.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: __JOB__
+spec:
+  backoffLimit: 1000
+  ttlSecondsAfterFinished: 604800
+  template:
+    spec:
+      restartPolicy: Never
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: nvidia.com/gpu.product
+                operator: In
+                values: [NVIDIA-A10, NVIDIA-GeForce-RTX-3090, NVIDIA-GeForce-RTX-4090]
+              - key: kubernetes.io/hostname
+                operator: NotIn
+                values:
+                - hcc-chase-shor-c4715.unl.edu
+                - ry-gpu-09.sdsc.optiputer.net
+                - hcc-nrp-shor-c6017.unl.edu
+                - gpu-18.nrp.mghpcc.org
+                - nautilus-ext-gpu01.fullerton.edu
+                - ry-gpu-03.sdsc.optiputer.net
+                - uicnrp-fiona.evl.uic.edu
+                - hcc-nrp-shor-c5825.unl.edu
+                - fiona-prg1.cesnet.cz
+                - nrp-01.laccd.edu
+                - hcc-nrp-shor-c5925.unl.edu
+                - ry-gpu-01.sdsc.optiputer.net
+                - k8s-3090-01.usd.edu
+                - k8s-chase-ci-07.calit2.optiputer.net
+                - ry-gpu-02.sdsc.optiputer.net
+                - hcc-chase-shor-c4705.unl.edu
+                - ry-gpu-06.sdsc.optiputer.net
+                - k8s-haosu-12.sdsc.optiputer.net
+                - k8s-chase-ci-01.calit2.optiputer.net
+      containers:
+      - name: robust
+        image: pytorch/pytorch:2.5.1-cuda12.4-cudnn9-runtime
+        workingDir: /pvc/ali-vol-500g/gully/code
+        command: [/bin/bash, -c]
+        args:
+        - |
+          set -e
+          pip install -q pandas pyarrow scipy scikit-learn pyyaml 2>&1 | tail -1
+          pip install -q -e . --no-deps
+          python scripts/run_robust.py --features /pvc/ali-vol-500g/gully/features/flexivit_s \
+            --pseudo __PSEUDO__ --modes __MODES__ --heads __HEADS__ --seeds __SEEDS__ __EXTRA__ \
+            --out /pvc/ali-vol-500g/gully/results
+        resources:
+          limits: {nvidia.com/gpu: 1, cpu: '4', memory: 12Gi, ephemeral-storage: 80Gi}
+          requests: {nvidia.com/gpu: 1, cpu: '4', memory: 12Gi, ephemeral-storage: 80Gi}
+        volumeMounts:
+        - {name: v500, mountPath: /pvc/ali-vol-500g}
+        - {name: dshm, mountPath: /dev/shm}
+      volumes:
+      - name: v500
+        persistentVolumeClaim: {claimName: ali-vol-500g}
+      - name: dshm
+        emptyDir: {medium: Memory, sizeLimit: 4Gi}
