@@ -2,26 +2,26 @@
 \centering
 \footnotesize
 \setlength{\tabcolsep}{3pt}
-\caption{Student models on the development split ($n=150$; mean $\pm$ standard deviation over 3 seeds). The student is a head on frozen FlexiViT-S features of the eight images; rows differ in the pseudo-labels it is trained on. Threshold 0.5; the epoch is chosen on the development split.}
+\caption{Student models on the development split ($n=150$; mean $\pm$ standard deviation over 3 seeds). The student is a head on frozen FlexiViT-S features of the eight images; rows differ in the pseudo-labels it is trained on. Threshold 0.5; the epoch is chosen on the development split. Best value of each column in bold, second best underlined.}
 \label{tab:students}
 \begin{tabular}{llcccc}
 \toprule
 Training labels & Head & Acc & F1 & ROC & PR-AUC \\
 \midrule
-32B labeler alone, hard & MLP & 0.671$\pm$0.023 & 0.706$\pm$0.036 & 0.737 & 0.719$\pm$0.040 \\
-32B labeler alone, hard & Temporal attention & 0.669$\pm$0.017 & 0.631$\pm$0.024 & 0.766 & 0.787$\pm$0.005 \\
-32B labeler alone, $P(\mathrm{yes})$ & MLP & 0.613$\pm$0.000 & 0.558$\pm$0.038 & 0.708 & 0.702$\pm$0.031 \\
-32B labeler alone, $P(\mathrm{yes})$ & Temporal attention & 0.662$\pm$0.014 & 0.641$\pm$0.041 & 0.752 & 0.782$\pm$0.021 \\
-Snorkel, binary labelers & MLP & 0.644$\pm$0.010 & 0.705$\pm$0.010 & 0.676 & 0.696$\pm$0.024 \\
-Snorkel, binary labelers & Temporal attention & 0.629$\pm$0.034 & 0.656$\pm$0.097 & 0.702 & 0.715$\pm$0.018 \\
-Snorkel, confidence-valued 32B & MLP & 0.644$\pm$0.010 & 0.704$\pm$0.013 & 0.692 & 0.700$\pm$0.028 \\
-Snorkel, confidence-valued 32B & Temporal attention & 0.638$\pm$0.039 & 0.711$\pm$0.049 & 0.717 & 0.754$\pm$0.039 \\
-Dawid--Skene, binary labelers & MLP & 0.664$\pm$0.020 & 0.732$\pm$0.019 & 0.664 & 0.667$\pm$0.015 \\
-Dawid--Skene, binary labelers & Temporal attention & 0.593$\pm$0.041 & 0.686$\pm$0.016 & 0.686 & 0.705$\pm$0.008 \\
-Dawid--Skene, confidence-valued 32B & MLP & 0.664$\pm$0.027 & 0.738$\pm$0.023 & 0.660 & 0.659$\pm$0.023 \\
-Dawid--Skene, confidence-valued 32B & Temporal attention & 0.627$\pm$0.027 & 0.701$\pm$0.033 & 0.671 & 0.715$\pm$0.043 \\
-Majority vote, hard & MLP & 0.642$\pm$0.015 & 0.690$\pm$0.045 & 0.676 & 0.685$\pm$0.010 \\
-Majority vote, hard & Temporal attention & 0.631$\pm$0.027 & 0.679$\pm$0.035 & 0.683 & 0.716$\pm$0.026 \\
+32B labeler alone, hard & MLP & \textbf{0.671$\pm$0.023} & 0.706$\pm$0.036 & 0.737 & 0.719$\pm$0.040  \\
+32B labeler alone, hard & Temporal attention & \underline{0.669$\pm$0.017} & 0.631$\pm$0.024 & \textbf{0.766} & \textbf{0.787$\pm$0.005} \\
+32B labeler alone, $P(\mathrm{yes})$ & MLP & 0.613$\pm$0.000 & 0.558$\pm$0.038 & 0.708 & 0.702$\pm$0.031  \\
+32B labeler alone, $P(\mathrm{yes})$ & Temporal attention & 0.662$\pm$0.014 & 0.641$\pm$0.041 & \underline{0.752} & \underline{0.782$\pm$0.021} \\
+Snorkel, binary labelers & MLP & 0.644$\pm$0.010 & 0.705$\pm$0.010 & 0.676 & 0.696$\pm$0.024  \\
+Snorkel, binary labelers & Temporal attention & 0.629$\pm$0.034 & 0.656$\pm$0.097 & 0.702 & 0.715$\pm$0.018  \\
+Snorkel, confidence-valued 32B & MLP & 0.644$\pm$0.010 & 0.704$\pm$0.013 & 0.692 & 0.700$\pm$0.028  \\
+Snorkel, confidence-valued 32B & Temporal attention & 0.638$\pm$0.039 & 0.711$\pm$0.049 & 0.717 & 0.754$\pm$0.039  \\
+Dawid--Skene, binary labelers & MLP & 0.664$\pm$0.020 & \underline{0.732$\pm$0.019} & 0.664 & 0.667$\pm$0.015  \\
+Dawid--Skene, binary labelers & Temporal attention & 0.593$\pm$0.041 & 0.686$\pm$0.016 & 0.686 & 0.705$\pm$0.008  \\
+Dawid--Skene, confidence-valued 32B & MLP & 0.664$\pm$0.027 & \textbf{0.738$\pm$0.023} & 0.660 & 0.659$\pm$0.023  \\
+Dawid--Skene, confidence-valued 32B & Temporal attention & 0.627$\pm$0.027 & 0.701$\pm$0.033 & 0.671 & 0.715$\pm$0.043  \\
+Majority vote, hard & MLP & 0.642$\pm$0.015 & 0.690$\pm$0.045 & 0.676 & 0.685$\pm$0.010  \\
+Majority vote, hard & Temporal attention & 0.631$\pm$0.027 & 0.679$\pm$0.035 & 0.683 & 0.716$\pm$0.026  \\
 \bottomrule
 \end{tabular}
 \end{table*}

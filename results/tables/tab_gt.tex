@@ -2,16 +2,16 @@
 \centering
 \footnotesize
 \setlength{\tabcolsep}{3pt}
-\caption{Expert ground-truth schemes: positive/negative counts among locations with a defined label, Fleiss' $\kappa$ over the three annotators (locations where all three give a vote), and agreement with the initial labels of the polygon database~\cite{reece2023using}. Precision, recall and F1 are macro-averaged over the two classes (so F1 is not the harmonic mean of the P and R shown); locations without a defined label are excluded from the agreement columns.}
+\caption{Expert ground-truth schemes: positive/negative counts among locations with a defined label, Fleiss' $\kappa$ over the three annotators (locations where all three give a vote), and agreement with the initial labels of the polygon database~\cite{reece2023using}. Precision, recall and F1 are macro-averaged over the two classes (so F1 is not the harmonic mean of the P and R shown); locations without a defined label are excluded from the agreement columns. Best value of each column in bold, second best underlined.}
 \label{tab:gt_metrics}
 \begin{tabular}{lcccccc}
 \toprule
 Scheme & Pos / Neg & $\kappa$ & Acc & P & R & F1 \\
 \midrule
-Strict pos. & 103 / 385 & 0.56 & 0.545 & 0.638 & 0.690 & 0.535 \\
-Lenient pos. & 107 / 381 & 0.55 & 0.553 & 0.644 & 0.694 & 0.544 \\
-Lenient neg. & 231 / 256 & 0.65 & 0.704 & 0.730 & 0.712 & 0.700 \\
-Strict neg. (main) & 257 / 227 & 0.58 & 0.736 & 0.748 & 0.727 & 0.727 \\
+Strict pos. & 103 / 385 & 0.56 & 0.545 & 0.638 & 0.690 & 0.535  \\
+Lenient pos. & 107 / 381 & 0.55 & 0.553 & 0.644 & 0.694 & 0.544  \\
+Lenient neg. & 231 / 256 & \textbf{0.65} & \underline{0.704} & \underline{0.730} & \underline{0.712} & \underline{0.700} \\
+Strict neg. (main) & 257 / 227 & \underline{0.58} & \textbf{0.736} & \textbf{0.748} & \textbf{0.727} & \textbf{0.727} \\
 \bottomrule
 \end{tabular}
 \end{table}

@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import glob
 import json
+import re
 from pathlib import Path
 
 import numpy as np
@@ -41,8 +42,33 @@ def f(x: float, d: int = 3) -> str:
     return "--" if x is None or (isinstance(x, float) and np.isnan(x)) else f"{x:.{d}f}"
 
 
-def _table(caption: str, label: str, colspec: str, header: str, rows: list[str], star: bool = False) -> str:
+def emphasize(rows: list[str], cols: tuple[int, ...]) -> list[str]:
+    """Bold the best and underline the second-best value of each column in `cols` (higher is better).
+
+    Ranks over all data rows (block-title rows are skipped); equal values share a rank; cells that are not
+    numbers ("--", counts) are ignored. For "mean$\\pm$sd" cells the mean decides.
+    """
+    split = [None if r.lstrip().startswith("\\multicolumn") else r.rstrip().removesuffix("\\\\").split(" & ") for r in rows]
+    for c in cols:
+        vals = {}
+        for i, cells in enumerate(split):
+            if cells is not None and c < len(cells) and re.match(r"^-?\d+\.\d+", cells[c].strip()):
+                vals[i] = float(re.match(r"^-?\d+\.\d+", cells[c].strip()).group())
+        top = sorted(set(vals.values()), reverse=True)[:2]
+        for i, v in vals.items():
+            if top and v == top[0]:
+                split[i][c] = f"\\textbf{{{split[i][c].strip()}}}"
+            elif len(top) > 1 and v == top[1]:
+                split[i][c] = f"\\underline{{{split[i][c].strip()}}}"
+    return [r if cells is None else " & ".join(cells) + " \\\\" for r, cells in zip(rows, split, strict=True)]
+
+
+def _table(caption: str, label: str, colspec: str, header: str, rows: list[str], star: bool = False,
+           rank_cols: tuple[int, ...] = ()) -> str:
     env = "table*" if star else "table"
+    if rank_cols:
+        rows = emphasize(rows, rank_cols)
+        caption += " Best value of each column in bold, second best underlined."
     return "\n".join([f"\\begin{{{env}}}[t]", "\\centering", "\\footnotesize", "\\setlength{\\tabcolsep}{3pt}",
                       f"\\caption{{{caption}}}",
                       f"\\label{{{label}}}", f"\\begin{{tabular}}{{{colspec}}}", "\\toprule", header, "\\midrule",
@@ -75,7 +101,7 @@ def gt_table(root: Path) -> str:
            "macro-averaged over the two classes (so F1 is not the harmonic mean of the P and R shown); "
            "locations without a defined label are excluded from the agreement columns.")
     return _table(cap, "tab:gt_metrics", "lcccccc",
-                  "Scheme & Pos / Neg & $\\kappa$ & Acc & P & R & F1 \\\\", rows)
+                  "Scheme & Pos / Neg & $\\kappa$ & Acc & P & R & F1 \\\\", rows, rank_cols=(2, 3, 4, 5, 6))
 
 
 def _labeler_metrics(root: Path, stem: str) -> dict:
@@ -129,7 +155,8 @@ def labeler_table(root: Path) -> str:
            "use $P(\\mathrm{yes})$ when the model provides it. The first three rows use the collage input and the "
            "prompt of the earlier zero-shot study; the Qwen3-VL rows use prompt \\texttt{sq\\_v4}.")
     return _table(cap, "tab:labelers", "llccccccrr",
-                  "Labeler & Input & Pos. & Cov. & Acc & F1 & P & R & ROC & PR \\\\", rows, star=True)
+                  "Labeler & Input & Pos. & Cov. & Acc & F1 & P & R & ROC & PR \\\\", rows, star=True,
+                  rank_cols=(4, 5, 6, 7, 8, 9))
 
 
 def labelmodel_table(root: Path) -> str:
@@ -159,7 +186,8 @@ def labelmodel_table(root: Path) -> str:
            "other blocks add the Qwen3-VL-32B labeler, whose $P(\\mathrm{yes})$ is a binary vote (second block) or a "
            "vote with an abstention band tuned on the development split (third block). The class prior of every "
            "model comes from the development labels. \\emph{Post.}: distinct pseudo-label values over the pool.")
-    return _table(cap, "tab:labelmodels", "lcccc", "Label model & Acc & F1 & PR-AUC & Post. \\\\", rows)
+    return _table(cap, "tab:labelmodels", "lcccc", "Label model & Acc & F1 & PR-AUC & Post. \\\\", rows,
+                  rank_cols=(1, 2, 3))
 
 
 def student_table(root: Path) -> str:
@@ -184,7 +212,7 @@ def student_table(root: Path) -> str:
            "The student is a head on frozen FlexiViT-S features of the eight images; rows differ in the "
            "pseudo-labels it is trained on. Threshold 0.5; the epoch is chosen on the development split.")
     return _table(cap, "tab:students", "llcccc", "Training labels & Head & Acc & F1 & ROC & PR-AUC \\\\", rows,
-                  star=True)
+                  star=True, rank_cols=(2, 3, 4, 5))
 
 
 E13_MODES = {
@@ -238,7 +266,7 @@ def robust_table(root: Path) -> str:
            "robust loss is generalized cross-entropy ($q=0.7$); in V2 and V3 the uncertain locations are labeled by "
            "an exponential moving average of the student itself, starting after 10 epochs (V2) or at epoch 0 (V3).")
     return _table(cap, "tab:robust", "lcccc", "Training & \\multicolumn{2}{c}{MLP} & \\multicolumn{2}{c}{Temporal} \\\\\n"
-                  " & Acc & PR-AUC & Acc & PR-AUC \\\\", rows, star=True)
+                  " & Acc & PR-AUC & Acc & PR-AUC \\\\", rows, star=True, rank_cols=(1, 2, 3, 4))
 
 
 def numbers(root: Path) -> str:

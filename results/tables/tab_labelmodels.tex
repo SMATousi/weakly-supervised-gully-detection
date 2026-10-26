@@ -2,25 +2,25 @@
 \centering
 \footnotesize
 \setlength{\tabcolsep}{3pt}
-\caption{Label models on the development split ($n=150$). The first block uses the three earlier labelers; the other blocks add the Qwen3-VL-32B labeler, whose $P(\mathrm{yes})$ is a binary vote (second block) or a vote with an abstention band tuned on the development split (third block). The class prior of every model comes from the development labels. \emph{Post.}: distinct pseudo-label values over the pool.}
+\caption{Label models on the development split ($n=150$). The first block uses the three earlier labelers; the other blocks add the Qwen3-VL-32B labeler, whose $P(\mathrm{yes})$ is a binary vote (second block) or a vote with an abstention band tuned on the development split (third block). The class prior of every model comes from the development labels. \emph{Post.}: distinct pseudo-label values over the pool. Best value of each column in bold, second best underlined.}
 \label{tab:labelmodels}
 \begin{tabular}{lcccc}
 \toprule
 Label model & Acc & F1 & PR-AUC & Post. \\
 \midrule
 \multicolumn{5}{l}{\emph{3 earlier labelers, binary}} \\
-Majority vote & 0.667 & 0.719 & 0.690 & -- \\
-Snorkel & 0.673 & 0.726 & 0.710 & 7 \\
+Majority vote & 0.667 & 0.719 & 0.690 & --  \\
+Snorkel & 0.673 & 0.726 & 0.710 & 7  \\
 \multicolumn{5}{l}{\emph{+ Qwen3-VL-32B, binary}} \\
-Majority vote & 0.680 & 0.742 & 0.748 & 6 \\
-Dawid--Skene & 0.687 & 0.764 & 0.765 & 17 \\
-Triplet method & 0.680 & 0.733 & 0.746 & 13 \\
-Snorkel & 0.680 & 0.747 & 0.765 & 17 \\
+Majority vote & 0.680 & 0.742 & 0.748 & 6  \\
+Dawid--Skene & \underline{0.687} & \textbf{0.764} & 0.765 & 17  \\
+Triplet method & 0.680 & 0.733 & 0.746 & 13  \\
+Snorkel & 0.680 & 0.747 & 0.765 & 17  \\
 \multicolumn{5}{l}{\emph{+ Qwen3-VL-32B, confidence-valued}} \\
-Majority vote & 0.673 & 0.732 & 0.730 & 7 \\
-Dawid--Skene & 0.687 & 0.759 & 0.789 & 23 \\
-Triplet method & 0.693 & 0.755 & 0.768 & 20 \\
-Snorkel & 0.660 & 0.730 & 0.791 & 21 \\
+Majority vote & 0.673 & 0.732 & 0.730 & 7  \\
+Dawid--Skene & \underline{0.687} & \underline{0.759} & \underline{0.789} & 23  \\
+Triplet method & \textbf{0.693} & 0.755 & 0.768 & 20  \\
+Snorkel & 0.660 & 0.730 & \textbf{0.791} & 21  \\
 \bottomrule
 \end{tabular}
 \end{table}

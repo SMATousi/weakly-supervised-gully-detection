@@ -44,3 +44,12 @@ def test_crossfit_removes_the_optimism_of_tuning_on_noise():
         accs_oof.append((o[o != -1] == y[o != -1]).mean())
     assert np.mean(accs_in) > 0.54          # in-sample tuning finds spurious "signal"
     assert abs(np.mean(accs_oof) - 0.5) < 0.04  # cross-fitted votes do not
+
+
+def test_emphasize_bold_best_underline_second():
+    from gully.eval.paper import emphasize
+
+    rows = ["a & 0.500 & 3 \\\\", "\\multicolumn{3}{l}{x} \\\\", "b & 0.700 & 4 \\\\", "c & 0.700$\\pm$0.010 & 5 \\\\", "d & -- & 6 \\\\", "e & 0.600 & 7 \\\\"]
+    out = emphasize(rows, (1,))
+    assert "\\textbf{0.700} " in out[2] and "\\textbf{0.700$\\pm$0.010}" in out[3]
+    assert "\\underline{0.600}" in out[5] and "0.500" in out[0] and "textbf" not in out[0] and out[1] == rows[1]
