@@ -3,7 +3,8 @@ model: openbmb/MiniCPM-V-4_5   # 8B, bf16 ~17 GB
 revision: null            # pin the HF commit sha before a full-pool run
 tp: 1
 max_model_len: 6144
-gpu_mem_util: 0.95
+gpu_mem_util: 0.88
+mm_limit: {image: 1, video: 0}   # profiling 8 video items of max size OOMed on a 24 GB card
 dtype: bfloat16
 llm_kwargs: {enforce_eager: true}
 trust_remote_code: true

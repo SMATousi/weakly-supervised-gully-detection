@@ -140,7 +140,7 @@ def _engine(cfg: dict):
         constraint = {"guided_decoding": GuidedDecodingParams(json=ANSWER_SCHEMA)}
     llm = LLM(model=cfg["model"], revision=cfg.get("revision"), tensor_parallel_size=cfg.get("tp", 1),
               max_model_len=cfg.get("max_model_len", 8192), dtype=cfg.get("dtype", "bfloat16"),
-              limit_mm_per_prompt={"image": 8}, gpu_memory_utilization=cfg.get("gpu_mem_util", 0.9),
+              limit_mm_per_prompt=cfg.get("mm_limit", {"image": 1 if cfg.get("image_mode") == "collage" else 8}), gpu_memory_utilization=cfg.get("gpu_mem_util", 0.9),
               trust_remote_code=cfg.get("trust_remote_code", False), seed=cfg.get("seed", 0),
               **cfg.get("llm_kwargs", {}))
     return llm, SamplingParams(temperature=0.0, max_tokens=48, logprobs=20, **constraint)
