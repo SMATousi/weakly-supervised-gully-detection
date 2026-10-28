@@ -229,3 +229,19 @@ Setup: the same frozen FlexiViT-S features and training recipe as E7; pseudo-lab
 - **2026-10-28 status:** after ~2 h, 9 of the 10 collage jobs were still pending (24 GB cards in 2-, 4- and 8-GPU groups are scarce). MiniCPM-V-4.5 loaded, then ran out of memory while vLLM profiled 8 video items on a 24 GB card; fixed by limiting multimodal inputs to what the collage needs (`limit_mm_per_prompt` = 1 image for collage mode; `mm_limit: {image: 1, video: 0}` in its config). Retries pick the fix up from the PVC code copy.
 - **2026-10-28, 4 h in:** still 0 of 10 scheduled (MiniCPM-V failed 3 times, the last two before the memory fix reached the PVC). Single-A100 variants (`*-1gpu_sq_collage.yaml`, for Mistral, Gemma, Qwen2.5-VL-32B, Pixtral, Kimi) were all still pending after 9 min and were cancelled, per the rule "A100 only if one card suffices and it is granted fast". The configs stay for later.
 - **2026-10-28, 6 h in:** the 9 other jobs are still unscheduled. MiniCPM-V-4.5 failed a 4th time even with the 1-image limit: vLLM still profiles the vision encoder with 12 maximum-size image slices on a 24 GB card (16.5 GB weights + encoder activations > 23.7 GB). Job deleted (a small model that is likely yes-biased, like the other <= 12B models); a retry would need a smaller encoder budget (`max_num_batched_tokens`, fewer slices).
+
+### E3b results, first five collage models (2026-10-29; `results/E3/screening_collage_models.json`; dev n=150; collage 1200x600, prompt `sq_v4`)
+| Labeler (collage) | Pos. | Acc | F1 | ROC-AUC | PR-AUC | Acc at dev-best threshold* |
+|---|---|---|---|---|---|---|
+| Qwen3-VL-32B-FP8 (reference) | 0.33 | 0.713 | 0.667 | 0.786 | 0.815 | 0.747 |
+| Pixtral-12B | 0.95 | 0.580 | 0.717 | 0.775 | 0.805 | 0.707 |
+| Qwen2.5-VL-32B-AWQ | 0.95 | 0.587 | 0.721 | 0.652 | 0.661 | 0.627 |
+| Kimi-VL-A3B | 1.00 | 0.533 | 0.696 | 0.624 | 0.641 | 0.640 |
+| Mistral-Small-3.2-24B (fp8) | 0.88 | 0.627 | 0.736 | 0.619 | 0.627 | 0.653 |
+| Gemma-3-27B (fp8) | 1.00 | 0.533 | 0.696 | 0.623 | 0.617 | 0.667 |
+\*threshold chosen on the same dev split, so optimistic.
+- **Only Pixtral-12B is promising.** Its hard answers are yes-biased (95% "yes", like the other new models), but its P(yes) ranks almost as well as the 32B's (ROC 0.775 vs 0.786, PR 0.805 vs 0.815), a surprise for a 12B model. The other four rank poorly (ROC 0.62-0.65) and Gemma and Kimi answer "yes" to every location (identical errors).
+- **The negative error correlation with the 32B (-0.3 to -0.4) is an artifact of yes-bias** (the 32B says "no" much more often, so their mistakes are on opposite sets); it does not mean diversity.
+- **Caveats:** 4-bit AWQ / on-load fp8 quantization may cost some accuracy for Qwen2.5-VL-32B, Mistral and Gemma; one prompt (`sq_v4`, tuned for the Qwen3-VL-32B), n=150 (AUC SE ~0.045), so Pixtral and the 32B are statistically indistinguishable in ranking.
+- **Still queued:** Qwen2.5-VL-72B-AWQ, InternVL3-78B-AWQ, InternVL3.5-38B, GLM-4.5V.
+- **Next (proposed):** run Pixtral-12B on the pool (cheap), then test it with the 32B in the confidence-valued label model and as a second distillation teacher.

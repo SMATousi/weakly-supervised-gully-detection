@@ -1,0 +1,144 @@
+{
+  "labelers": {
+    "gemma-3-27b-fp8_sq_collage": {
+      "file": "gemma-3-27b-fp8_sq_collage.labeled.jsonl",
+      "n_dev": 150,
+      "coverage": 1.0,
+      "pos_rate": 1.0,
+      "acc_covered": 0.5333333333333333,
+      "acc": 0.5333333333333333,
+      "f1": 0.6956521739130436,
+      "precision": 0.5333333333333333,
+      "recall": 1.0,
+      "pr_auc": 0.6172531560237635,
+      "roc_auc": 0.6226785714285714,
+      "dev_best_thr": 0.9999998144609421,
+      "acc_at_dev_best_thr": 0.6666666666666666
+    },
+    "kimi-vl-a3b_sq_collage": {
+      "file": "kimi-vl-a3b_sq_collage.labeled.jsonl",
+      "n_dev": 150,
+      "coverage": 1.0,
+      "pos_rate": 1.0,
+      "acc_covered": 0.5333333333333333,
+      "acc": 0.5333333333333333,
+      "f1": 0.6956521739130436,
+      "precision": 0.5333333333333333,
+      "recall": 1.0,
+      "pr_auc": 0.640779419189774,
+      "roc_auc": 0.6235714285714287,
+      "dev_best_thr": 0.8175717383795541,
+      "acc_at_dev_best_thr": 0.64
+    },
+    "mistral-small-3.2-24b-fp8_sq_collage": {
+      "file": "mistral-small-3.2-24b-fp8_sq_collage.labeled.jsonl",
+      "n_dev": 150,
+      "coverage": 1.0,
+      "pos_rate": 0.88,
+      "acc_covered": 0.6266666666666667,
+      "acc": 0.6266666666666667,
+      "f1": 0.7358490566037736,
+      "precision": 0.5909090909090909,
+      "recall": 0.975,
+      "pr_auc": 0.626697554135822,
+      "roc_auc": 0.6189285714285714,
+      "dev_best_thr": 0.6791895497114181,
+      "acc_at_dev_best_thr": 0.6533333333333333
+    },
+    "pixtral-12b_sq_collage": {
+      "file": "pixtral-12b_sq_collage.labeled.jsonl",
+      "n_dev": 150,
+      "coverage": 1.0,
+      "pos_rate": 0.9533333333333334,
+      "acc_covered": 0.58,
+      "acc": 0.58,
+      "f1": 0.7174887892376681,
+      "precision": 0.5594405594405595,
+      "recall": 1.0,
+      "pr_auc": 0.8053990896376009,
+      "roc_auc": 0.7746428571428572,
+      "dev_best_thr": 0.8519529364502061,
+      "acc_at_dev_best_thr": 0.7066666666666667
+    },
+    "qwen2.5-vl-32b-awq_sq_collage": {
+      "file": "qwen2.5-vl-32b-awq_sq_collage.labeled.jsonl",
+      "n_dev": 150,
+      "coverage": 1.0,
+      "pos_rate": 0.9466666666666667,
+      "acc_covered": 0.5866666666666667,
+      "acc": 0.5866666666666667,
+      "f1": 0.7207207207207207,
+      "precision": 0.5633802816901409,
+      "recall": 1.0,
+      "pr_auc": 0.6611732897719329,
+      "roc_auc": 0.6519642857142858,
+      "dev_best_thr": 0.6224662682622251,
+      "acc_at_dev_best_thr": 0.6266666666666667
+    },
+    "qwen3-vl-32b-fp8_sq_collage__sq_v4": {
+      "file": "qwen3-vl-32b-fp8_sq_collage__sq_v4.labeled.jsonl",
+      "n_dev": 150,
+      "coverage": 1.0,
+      "pos_rate": 0.32666666666666666,
+      "acc_covered": 0.7133333333333334,
+      "acc": 0.7133333333333334,
+      "f1": 0.6666666666666666,
+      "precision": 0.8775510204081632,
+      "recall": 0.5375,
+      "pr_auc": 0.8152872133777834,
+      "roc_auc": 0.7858928571428572,
+      "dev_best_thr": 0.18242553785347201,
+      "acc_at_dev_best_thr": 0.7466666666666667
+    }
+  },
+  "error_corr": {
+    "gemma-3-27b-fp8_sq_collage": {
+      "gemma-3-27b-fp8_sq_collage": 1.0,
+      "kimi-vl-a3b_sq_collage": 1.0,
+      "mistral-small-3.2-24b-fp8_sq_collage": 0.77,
+      "pixtral-12b_sq_collage": 0.91,
+      "qwen2.5-vl-32b-awq_sq_collage": 0.9,
+      "qwen3-vl-32b-fp8_sq_collage__sq_v4": -0.42
+    },
+    "kimi-vl-a3b_sq_collage": {
+      "gemma-3-27b-fp8_sq_collage": 1.0,
+      "kimi-vl-a3b_sq_collage": 1.0,
+      "mistral-small-3.2-24b-fp8_sq_collage": 0.77,
+      "pixtral-12b_sq_collage": 0.91,
+      "qwen2.5-vl-32b-awq_sq_collage": 0.9,
+      "qwen3-vl-32b-fp8_sq_collage__sq_v4": -0.42
+    },
+    "mistral-small-3.2-24b-fp8_sq_collage": {
+      "gemma-3-27b-fp8_sq_collage": 0.77,
+      "kimi-vl-a3b_sq_collage": 0.77,
+      "mistral-small-3.2-24b-fp8_sq_collage": 1.0,
+      "pixtral-12b_sq_collage": 0.85,
+      "qwen2.5-vl-32b-awq_sq_collage": 0.86,
+      "qwen3-vl-32b-fp8_sq_collage__sq_v4": -0.28
+    },
+    "pixtral-12b_sq_collage": {
+      "gemma-3-27b-fp8_sq_collage": 0.91,
+      "kimi-vl-a3b_sq_collage": 0.91,
+      "mistral-small-3.2-24b-fp8_sq_collage": 0.85,
+      "pixtral-12b_sq_collage": 1.0,
+      "qwen2.5-vl-32b-awq_sq_collage": 0.93,
+      "qwen3-vl-32b-fp8_sq_collage__sq_v4": -0.36
+    },
+    "qwen2.5-vl-32b-awq_sq_collage": {
+      "gemma-3-27b-fp8_sq_collage": 0.9,
+      "kimi-vl-a3b_sq_collage": 0.9,
+      "mistral-small-3.2-24b-fp8_sq_collage": 0.86,
+      "pixtral-12b_sq_collage": 0.93,
+      "qwen2.5-vl-32b-awq_sq_collage": 1.0,
+      "qwen3-vl-32b-fp8_sq_collage__sq_v4": -0.35
+    },
+    "qwen3-vl-32b-fp8_sq_collage__sq_v4": {
+      "gemma-3-27b-fp8_sq_collage": -0.42,
+      "kimi-vl-a3b_sq_collage": -0.42,
+      "mistral-small-3.2-24b-fp8_sq_collage": -0.28,
+      "pixtral-12b_sq_collage": -0.36,
+      "qwen2.5-vl-32b-awq_sq_collage": -0.35,
+      "qwen3-vl-32b-fp8_sq_collage__sq_v4": 1.0
+    }
+  }
+}
