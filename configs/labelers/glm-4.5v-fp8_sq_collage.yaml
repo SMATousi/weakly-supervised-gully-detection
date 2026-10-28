@@ -1,0 +1,14 @@
+name: glm-4.5v-fp8_sq_collage
+model: zai-org/GLM-4.5V-FP8   # 106B-A12B MoE, FP8 ~108 GB: needs 8 x 24 GB cards
+revision: null            # pin the HF commit sha before a full-pool run
+tp: 8
+max_model_len: 4096
+gpu_mem_util: 0.95
+dtype: bfloat16
+llm_kwargs: {enforce_eager: true}
+image_mode: collage     # 4x2 grid with years, 1200x600
+naip_size: 224
+highres_size: 672
+prompt_file: configs/prompts/single_question.yaml
+prompt_id: sq_v4
+seed: 0

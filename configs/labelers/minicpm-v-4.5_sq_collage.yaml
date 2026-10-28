@@ -1,0 +1,15 @@
+name: minicpm-v-4.5_sq_collage
+model: openbmb/MiniCPM-V-4_5   # 8B, bf16 ~17 GB
+revision: null            # pin the HF commit sha before a full-pool run
+tp: 1
+max_model_len: 6144
+gpu_mem_util: 0.95
+dtype: bfloat16
+llm_kwargs: {enforce_eager: true}
+trust_remote_code: true
+image_mode: collage     # 4x2 grid with years, 1200x600
+naip_size: 224
+highres_size: 672
+prompt_file: configs/prompts/single_question.yaml
+prompt_id: sq_v4
+seed: 0

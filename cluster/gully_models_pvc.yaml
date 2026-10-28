@@ -1,0 +1,8 @@
+# Model-weight cache for the VLM screening (HF_HOME); the 500g volume was ~60% full of old model caches.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata: {name: gully-models}
+spec:
+  accessModes: [ReadWriteMany]
+  storageClassName: rook-cephfs-central
+  resources: {requests: {storage: 1Ti}}

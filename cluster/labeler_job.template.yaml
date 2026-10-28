@@ -36,7 +36,7 @@ spec:
                 --pvc-root ali-vol-500g=/pvc/ali-vol-500g --pvc-root ali-vol-1tera=/pvc/ali-vol-1tera \
                 --out /pvc/ali-vol-500g/gully/labels
           env:
-            - {name: HF_HOME, value: /pvc/ali-vol-500g/gully/hf}
+            - {name: HF_HOME, value: /pvc/gully-models/hf}   # 1 Ti volume for model weights (the 500g one was filling up)
             - {name: VLLM_WORKER_MULTIPROC_METHOD, value: spawn}
             - {name: VLLM_ENGINE_ITERATION_TIMEOUT_S, value: "600"}   # first batch on a slow node + near-full GPU memory exceeded the 60 s default
             - {name: VLLM_RPC_TIMEOUT, value: "600000"}
@@ -46,11 +46,14 @@ spec:
           volumeMounts:
             - {name: v500, mountPath: /pvc/ali-vol-500g}
             - {name: v1t, mountPath: /pvc/ali-vol-1tera, readOnly: true}
+            - {name: vmodels, mountPath: /pvc/gully-models}
             - {name: shm, mountPath: /dev/shm}
       volumes:
         - name: v500
           persistentVolumeClaim: {claimName: ali-vol-500g}
         - name: v1t
           persistentVolumeClaim: {claimName: ali-vol-1tera, readOnly: true}
+        - name: vmodels
+          persistentVolumeClaim: {claimName: gully-models}
         - name: shm
           emptyDir: {medium: Memory, sizeLimit: 16Gi}

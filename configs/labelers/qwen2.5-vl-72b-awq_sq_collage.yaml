@@ -1,0 +1,14 @@
+name: qwen2.5-vl-72b-awq_sq_collage
+model: Qwen/Qwen2.5-VL-72B-Instruct-AWQ   # 4-bit AWQ, ~41 GB
+revision: null            # pin the HF commit sha before a full-pool run
+tp: 4
+max_model_len: 3072
+gpu_mem_util: 0.95
+dtype: float16
+llm_kwargs: {enforce_eager: true}
+image_mode: collage     # 4x2 grid with years, 1200x600
+naip_size: 224
+highres_size: 672
+prompt_file: configs/prompts/single_question.yaml
+prompt_id: sq_v4
+seed: 0

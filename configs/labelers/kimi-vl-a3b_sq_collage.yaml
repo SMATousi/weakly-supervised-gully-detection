@@ -1,0 +1,15 @@
+name: kimi-vl-a3b_sq_collage
+model: moonshotai/Kimi-VL-A3B-Instruct   # 16B MoE (3B active), bf16 ~32 GB
+revision: null            # pin the HF commit sha before a full-pool run
+tp: 2
+max_model_len: 6144
+gpu_mem_util: 0.95
+dtype: bfloat16
+llm_kwargs: {enforce_eager: true}
+trust_remote_code: true
+image_mode: collage     # 4x2 grid with years, 1200x600
+naip_size: 224
+highres_size: 672
+prompt_file: configs/prompts/single_question.yaml
+prompt_id: sq_v4
+seed: 0
